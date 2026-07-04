@@ -543,14 +543,14 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
 
             if (guidanceTypeValue === "exoSimple") {
                 guidanceText += "Exchange Online に接続した PowerShell にて以下のコマンドを実行し、デスクトップに出力された XML ファイルをお寄せください。\n\n"
-                guidanceText += "   cd $env:USERPROFILE\\Desktop\n"
+                guidanceText += `   cd ${exportFolderPath}\n`
                 // guidanceText += "XML ファイルの出力先は適宜変更ください。\n\n"
                 guidanceText += `${commandGuidanceText}`;
                 return guidanceText;
             }
             else if (guidanceTypeValue === "onpremSimple") {
                 guidanceText += "任意のメールボックス サーバーで起動した Exchange 管理シェルにて以下のコマンドを実行し、デスクトップに出力された XML ファイルをお寄せください。\n\n"
-                guidanceText += "   cd $env:USERPROFILE\\Desktop\n"
+                guidanceText += `   cd ${exportFolderPath}\n`
                 // guidanceText += "XML ファイルの出力先は適宜変更ください。\n\n"
                 guidanceText += `${commandGuidanceText}`;
                 return guidanceText;
@@ -1176,7 +1176,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
             const exportToDesktop = document.getElementById("exportToDesktop");
 
             if (exportToDesktop && exportToDesktop.checked) {
-                return "$env:USERPROFILE\\Desktop";
+                return "~\\Desktop";
             }
 
             return getExportDirectoryPath();
