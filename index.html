@@ -527,22 +527,21 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
             }
         ];
 
-        function generateGuidanceSteps(commandText) {
+        function generateGuidanceSteps(varDefsText, commandText) {
             const guidanceTypeSelect = document.getElementById("guidanceType");
             const guidanceTypeValue = guidanceTypeSelect ? guidanceTypeSelect.value : "exo";
             const includeTranscript = document.getElementById("includeTranscript");
             const transcriptEnabled = !!(includeTranscript && includeTranscript.checked);
             const exportToDesktop = document.getElementById("exportToDesktop");
             const exportFolderPath = getExportFolderPath();
-            const desktopDefaultOutputNote = exportToDesktop && exportToDesktop.checked
-                ? "以下の実行例ではデスクトップに移動しますが、"
-                : "";
-            const commandGuidanceText = indentNonEmptyLines(commandText);
+            const varDefsGuidanceText = varDefsText ? indentNonEmptyLines(varDefsText.trimEnd()) + "\n" : "";
+            const commandGuidanceText = commandText ? indentNonEmptyLines(commandText.trimEnd()) + "\n" : "";
             let guidanceText = "";
             let step = 1;
 
             if (guidanceTypeValue === "exoSimple") {
                 guidanceText += "Exchange Online に接続した PowerShell にて以下のコマンドを実行し、デスクトップに出力された XML ファイルをお寄せください。\n\n"
+                guidanceText += `${varDefsGuidanceText}\n`
                 guidanceText += `   cd ${exportFolderPath}\n`
                 // guidanceText += "XML ファイルの出力先は適宜変更ください。\n\n"
                 guidanceText += `${commandGuidanceText}`;
@@ -550,6 +549,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
             }
             else if (guidanceTypeValue === "onpremSimple") {
                 guidanceText += "任意のメールボックス サーバーで起動した Exchange 管理シェルにて以下のコマンドを実行し、デスクトップに出力された XML ファイルをお寄せください。\n\n"
+                guidanceText += `${varDefsGuidanceText}\n`
                 guidanceText += `   cd ${exportFolderPath}\n`
                 // guidanceText += "XML ファイルの出力先は適宜変更ください。\n\n"
                 guidanceText += `${commandGuidanceText}`;
@@ -571,13 +571,19 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
 
             if (guidanceTypeValue === "onprem") {
                 guidanceText += `${step++}. 任意のメールボックス サーバーで Exchange 管理シェルを起動します。\n`;
+                guidanceText += `${step++}. 以下の cd コマンドにて情報採取結果を出力するフォルダーに移動します。\n`;
             }
             else {
-                guidanceText += `${step++}. PowerShell を起動します。\n`;
+                guidanceText += `${step++}. PowerShell を起動し、以下の cd コマンドにて情報採取結果を出力するフォルダーに移動します。\n`;
             }
 
-            guidanceText += `${step++}. 以下の cd コマンドを実行し、情報採取結果を出力するフォルダーに移動します。\n`;
-            guidanceText += `   ${desktopDefaultOutputNote}任意のフォルダーに変更いただいて構いません。\n\n`;
+            if (exportToDesktop && exportToDesktop.checked) {
+                guidanceText += "   以下の実行例ではデスクトップに移動しますが、任意のフォルダーに変更いただいて構いません。\n\n";
+            }
+            else {
+                guidanceText += "   移動先は任意のフォルダーに変更いただいて構いません。\n\n";
+            }
+
             guidanceText += `    cd ${exportFolderPath}\n\n`;
 
             if (transcriptEnabled) {
@@ -1511,7 +1517,8 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
         function generate() {
             handleVarNameInput(null, false);
             updateAllParentCheckboxes();
-            let result = "";
+            let varDefsText = "";
+            let commandsText = "";
 
             const targetVarNames = document.querySelectorAll(".target-var-name");
             const targetVarValues = document.querySelectorAll(".target-var-value");
@@ -1534,7 +1541,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                 }
 
                 if (varName && value) {
-                    result += `$${varName} = "${value}"\n`;
+                    varDefsText += `$${varName} = "${value}"\n`;
                 }
             }
 
@@ -1544,24 +1551,23 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                 alert("複数の変数定義されています。\n[ファイル名に変数を含める] が無効の場合、ファイル名が重複する可能性があります。");
             }
 
-            result += "\n";
-
             for (const cmd of commands) {
                 const chunk = buildCommandOutputChunk(cmd, targetVarNames);
                 if (chunk === null) {
                     return;
                 }
 
-                result += chunk;
+                commandsText += chunk;
             }
 
             const includeGuidanceText = document.getElementById("includeGuidanceText");
             if (includeGuidanceText && includeGuidanceText.checked) {
-                const guidanceText = generateGuidanceSteps(result);
-                result = guidanceText;
+                commandsText = generateGuidanceSteps(varDefsText, commandsText);
+            } else {
+                commandsText = varDefsText + "\n" + commandsText;
             }
 
-            document.getElementById("output").value = result;
+            document.getElementById("output").value = commandsText;
         }
 
         // Copies the generated script text to the clipboard.
