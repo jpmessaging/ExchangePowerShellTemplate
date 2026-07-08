@@ -734,7 +734,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
         // Checks if all checked commands support common guidance types and updates accordingly with priority: exo > onprem > graph.
         function updateGuidanceTypeIfNeeded() {
             const checkedCommands = commandDefinition.filter(cmd => {
-                const toggle = document.querySelector(`.cmd-toggle[data-cmd="${cmd.command}"]`);
+                const toggle = document.querySelector(`.cmd-toggle[data-cmd="${cmd.commandName}"]`);
                 return toggle && (toggle.checked || toggle.indeterminate);
             });
 
