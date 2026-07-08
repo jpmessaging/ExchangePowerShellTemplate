@@ -705,6 +705,40 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
             });
 
             parentCheckbox.indeterminate = false;
+            updateGuidanceTypeIfNeeded();
+        }
+
+        // Checks if all checked commands support common guidance types and updates accordingly with priority: exo > onprem > graph.
+        function updateGuidanceTypeIfNeeded() {
+            const checkedCommands = commands.filter(cmd => {
+                const toggle = document.querySelector(`.cmd-toggle[data-cmd="${cmd.command}"]`);
+                return toggle && (toggle.checked || toggle.indeterminate);
+            });
+
+            if (checkedCommands.length === 0) {
+                return;
+            }
+
+            const guidanceTypeSelect = document.getElementById("guidanceType");
+            if (!guidanceTypeSelect) {
+                return;
+            }
+
+            // Find common applicable types across all checked commands
+            const commonApplicable = checkedCommands.reduce((common, cmd) => {
+                const cmdSet = new Set(cmd.applicable || []);
+                return common.filter(type => cmdSet.has(type));
+            }, [...(checkedCommands[0]?.applicable || [])]);
+
+            // Apply priority: exo > onprem > graph
+            const priorityOrder = ["exo", "onprem", "graph"];
+            for (const guidanceType of priorityOrder) {
+                if (commonApplicable.includes(guidanceType)) {
+                    guidanceTypeSelect.value = guidanceType;
+                    guidanceTypeSelect.dispatchEvent(new Event('change'));
+                    return;
+                }
+            }
         }
 
         // Applies expanded or collapsed UI state to a specific command section.
