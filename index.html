@@ -382,9 +382,9 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
 
 `;
 
-        const commands = [
+        const commandDefinition = [
             {
-                command: "Get-Mailbox",
+                commandName: "Get-Mailbox",
                 parameters: [
                     { key: "-Archive", type: "switch" },
                     { key: "-SoftDeletedMailbox", type: "switch-split" },
@@ -393,7 +393,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                 ]
             },
             {
-                command: "Get-MailboxStatistics",
+                commandName: "Get-MailboxStatistics",
                 parameters: [
                     { key: "-Archive", type: "switch-split" },
                     { key: "-IncludeMoveHistory", type: "switch" },
@@ -401,7 +401,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                 ]
             },
             {
-                command: "Get-MailboxFolderStatistics",
+                commandName: "Get-MailboxFolderStatistics",
                 parameters: [
                     { key: "-Archive", type: "switch-split" },
                     { key: "-IncludeOldestAndNewestItems", type: "switch" },
@@ -415,7 +415,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                 ]
             },
             {
-                command: "Get-MailboxFolderPermission",
+                commandName: "Get-MailboxFolderPermission",
                 parameters: [
                     {
                         key: "Folder",
@@ -431,19 +431,19 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                 ]
             },
             {
-                command: "Get-MailboxPermission"
+                commandName: "Get-MailboxPermission"
             },
             {
-                command: "Get-RecipientPermission"
+                commandName: "Get-RecipientPermission"
             },
             {
-                command: "Get-CASMailbox",
+                commandName: "Get-CASMailbox",
                 parameters: [
                     { key: "-ActiveSyncDebugLogging", type: "switch" }
                 ]
             },
             {
-                command: "Export-MailboxDiagnosticLogs",
+                commandName: "Export-MailboxDiagnosticLogs",
                 parameters: [
                     {
                         key: "-ComponentName",
@@ -454,37 +454,37 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                 ]
             },
             {
-                command: "Get-User"
+                commandName: "Get-User"
             },
             {
-                command: "Get-Recipient"
+                commandName: "Get-Recipient"
             },
             {
-                command: "Get-MailUser"
+                commandName: "Get-MailUser"
             },
             {
-                command: "Get-MailContact"
+                commandName: "Get-MailContact"
             },
             {
-                command: "Get-CalendarProcessing"
+                commandName: "Get-CalendarProcessing"
             },
             {
-                command: "Get-InboxRule",
+                commandName: "Get-InboxRule",
                 parameters: [
                     { key: "-IncludeHidden", type: "switch" }
                 ]
             },
             {
-                command: "Get-DistributionGroup"
+                commandName: "Get-DistributionGroup"
             },
             {
-                command: "Get-DistributionGroupMember"
+                commandName: "Get-DistributionGroupMember"
             },
             {
-                command: "Get-UnifiedGroup"
+                commandName: "Get-UnifiedGroup"
             },
             {
-                command: "Get-UnifiedGroupLinks",
+                commandName: "Get-UnifiedGroupLinks",
                 parameters: [
                     {
                         key: "-LinkType",
@@ -496,10 +496,10 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
             }
             ,
             {
-                command: "Get-Group"
+                commandName: "Get-Group"
             },
             {
-                command: "Get-MgUser",
+                commandName: "Get-MgUser",
                 parameters: [
                     {
                         key: "-Property",
@@ -511,19 +511,19 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                 ]
             },
             {
-                command: "Get-MgUserLicenseDetail"
+                commandName: "Get-MgUserLicenseDetail"
             },
             {
-                command: "Get-RemoteMailbox"
+                commandName: "Get-RemoteMailbox"
             },
             {
-                command: "Get-ADUser"
+                commandName: "Get-ADUser"
             },
             {
-                command: "Get-ADGroup"
+                commandName: "Get-ADGroup"
             },
             {
-                command: "Get-ADObject"
+                commandName: "Get-ADObject"
             }
         ];
 
@@ -643,9 +643,9 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
         }
 
         // Updates a command-level checkbox state based on its target checkbox states.
-        function updateParentCheckbox(cmdId) {
-            const parent = document.querySelector(`.cmd-toggle[data-cmd="${cmdId}"]`);
-            const children = document.querySelectorAll(`.${cmdId}_target`);
+        function updateParentCheckbox(commandName) {
+            const parent = document.querySelector(`.cmd-toggle[data-cmd="${commandName}"]`);
+            const children = document.querySelectorAll(`.${commandName}_target`);
 
             const total = children.length;
             const checked = Array.from(children).filter(cb => cb.checked).length;
@@ -664,14 +664,14 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
 
         // Recalculates parent checkbox states for all commands.
         function updateAllParentCheckboxes() {
-            commands.forEach(cmd => {
-                updateParentCheckbox(cmd.command);
+            commandDefinition.forEach(cmd => {
+                updateParentCheckbox(cmd.commandName);
             });
         }
 
         // Applies a command-level checkbox state to all target checkboxes for that command.
-        function toggleAllTargetsForCommand(cmdId, parentCheckbox) {
-            const children = document.querySelectorAll(`.${cmdId}_target`);
+        function toggleAllTargetsForCommand(commandName, parentCheckbox) {
+            const children = document.querySelectorAll(`.${commandName}_target`);
 
             children.forEach(cb => {
                 cb.checked = parentCheckbox.checked;
@@ -681,10 +681,10 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
         }
 
         // Applies expanded or collapsed UI state to a specific command section.
-        function setGroupExpanded(cmdId, group, expanded) {
-            const el = document.getElementById(`${group === "targets" ? "targetGroup" : "paramGroup"}_${cmdId}`);
-            const collapse = document.querySelector(`.collapse-toggle[data-cmd="${cmdId}"][data-group="${group}"]`);
-            const chevron = document.getElementById(`chevron_${group}_${cmdId}`);
+        function setGroupExpanded(commandName, group, expanded) {
+            const el = document.getElementById(`${group === "targets" ? "targetGroup" : "paramGroup"}_${commandName}`);
+            const collapse = document.querySelector(`.collapse-toggle[data-cmd="${commandName}"][data-group="${group}"]`);
+            const chevron = document.getElementById(`chevron_${group}_${commandName}`);
 
             if (!el || !collapse || !chevron) return;
 
@@ -700,49 +700,49 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
         }
 
         // Closes all collapsible command sections except the specified one.
-        function closeAllGroupsExcept(openCmdId, openGroup) {
-            commands.forEach(cmd => {
+        function closeAllGroupsExcept(openCommandName, openGroup) {
+            commandDefinition.forEach(cmd => {
                 ["targets", "params"].forEach(group => {
-                    if (cmd.command === openCmdId && group === openGroup) {
+                    if (cmd.commandName === openCommandName && group === openGroup) {
                         return;
                     }
 
-                    setGroupExpanded(cmd.command, group, false);
+                    setGroupExpanded(cmd.commandName, group, false);
                 });
             });
         }
 
         // Toggles one collapsible section and closes all other command sections.
-        function toggleGroup(cmdId, group) {
-            const collapse = document.querySelector(`.collapse-toggle[data-cmd="${cmdId}"][data-group="${group}"]`);
+        function toggleGroup(commandName, group) {
+            const collapse = document.querySelector(`.collapse-toggle[data-cmd="${commandName}"][data-group="${group}"]`);
             const expanded = collapse && collapse.getAttribute("aria-expanded") === "true";
 
             if (expanded) {
-                setGroupExpanded(cmdId, group, false);
+                setGroupExpanded(commandName, group, false);
                 return;
             }
 
             if (group === "targets") {
-                commands.forEach(cmd => {
-                    setGroupExpanded(cmd.command, "params", false);
+                commandDefinition.forEach(cmd => {
+                    setGroupExpanded(cmd.commandName, "params", false);
                 });
             } else {
-                closeAllGroupsExcept(cmdId, group);
+                closeAllGroupsExcept(commandName, group);
             }
-            setGroupExpanded(cmdId, group, true);
+            setGroupExpanded(commandName, group, true);
         }
 
         // Captures current command UI selections and collapse state for re-rendering.
         function saveState() {
             const state = {};
 
-            commands.forEach(cmd => {
-                const cmdKey = cmd.command;
-                const toggle = document.querySelector(`.cmd-toggle[data-cmd="${cmdKey}"]`);
-                const targetsCollapse = document.querySelector(`.collapse-toggle[data-cmd="${cmdKey}"][data-group="targets"]`);
-                const paramsCollapse = document.querySelector(`.collapse-toggle[data-cmd="${cmdKey}"][data-group="params"]`);
+            commandDefinition.forEach(cmd => {
+                const commandName = cmd.commandName;
+                const toggle = document.querySelector(`.cmd-toggle[data-cmd="${commandName}"]`);
+                const targetsCollapse = document.querySelector(`.collapse-toggle[data-cmd="${commandName}"][data-group="targets"]`);
+                const paramsCollapse = document.querySelector(`.collapse-toggle[data-cmd="${commandName}"][data-group="params"]`);
 
-                state[cmdKey] = {
+                state[commandName] = {
                     enabled: !!(toggle && toggle.checked),
                     targets: [],
                     params: [],
@@ -751,26 +751,26 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                     expandedParams: !!(paramsCollapse && paramsCollapse.getAttribute("aria-expanded") === "true")
                 };
 
-                document.querySelectorAll(`.${cmdKey}_target:checked`).forEach(cb => {
-                    state[cmdKey].targets.push(cb.value);
+                document.querySelectorAll(`.${commandName}_target:checked`).forEach(cb => {
+                    state[commandName].targets.push(cb.value);
                 });
 
-                document.querySelectorAll(`.${cmdKey}_param:checked`).forEach(cb => {
-                    state[cmdKey].params.push(cb.value);
+                document.querySelectorAll(`.${commandName}_param:checked`).forEach(cb => {
+                    state[commandName].params.push(cb.value);
                 });
 
                 if (cmd.parameters && cmd.parameters.length > 0) {
                     cmd.parameters.forEach(param => {
                         if (param.type === "multi-checkbox-split" || param.type === "multi-checkbox") {
                             const selectedValues = Array.from(
-                                document.querySelectorAll(`.${cmdKey}_value_${param.key}:checked`)
+                                document.querySelectorAll(`.${commandName}_value_${param.key}:checked`)
                             ).map(cb => cb.value);
-                            const hasRenderedInputs = !!document.querySelector(`.${cmdKey}_value_${param.key}`);
+                            const hasRenderedInputs = !!document.querySelector(`.${commandName}_value_${param.key}`);
                             const defaultSelectedOptions = Array.isArray(param.defaultSelectedOptions)
                                 ? param.defaultSelectedOptions
                                 : [];
 
-                            state[cmdKey].parameterValues[param.key] =
+                            state[commandName].parameterValues[param.key] =
                                 selectedValues.length > 0
                                     ? selectedValues
                                     : (!hasRenderedInputs ? defaultSelectedOptions : []);
@@ -784,22 +784,22 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
 
         // Restores saved command UI selections and expansion state.
         function restoreState(state) {
-            commands.forEach(cmd => {
-                const cmdKey = cmd.command;
+            commandDefinition.forEach(cmd => {
+                const commandName = cmd.commandName;
 
-                const toggle = document.querySelector(`.cmd-toggle[data-cmd="${cmdKey}"]`);
+                const toggle = document.querySelector(`.cmd-toggle[data-cmd="${commandName}"]`);
                 if (toggle) {
-                    toggle.checked = !!state[cmdKey].enabled;
+                    toggle.checked = !!state[commandName].enabled;
                 }
 
-                document.querySelectorAll(`.${cmdKey}_target`).forEach(cb => {
-                    if (state[cmdKey].targets.includes(cb.value)) {
+                document.querySelectorAll(`.${commandName}_target`).forEach(cb => {
+                    if (state[commandName].targets.includes(cb.value)) {
                         cb.checked = true;
                     }
                 });
 
-                document.querySelectorAll(`.${cmdKey}_param`).forEach(cb => {
-                    if (state[cmdKey].params.includes(cb.value)) {
+                document.querySelectorAll(`.${commandName}_param`).forEach(cb => {
+                    if (state[commandName].params.includes(cb.value)) {
                         cb.checked = true;
                     }
                 });
@@ -807,17 +807,17 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                 if (cmd.parameters && cmd.parameters.length > 0) {
                     cmd.parameters.forEach(param => {
                         if (param.type === "multi-checkbox-split" || param.type === "multi-checkbox") {
-                            const selectedValues = (state[cmdKey].parameterValues && state[cmdKey].parameterValues[param.key]) || [];
-                            document.querySelectorAll(`.${cmdKey}_value_${param.key}`).forEach(cb => {
+                            const selectedValues = (state[commandName].parameterValues && state[commandName].parameterValues[param.key]) || [];
+                            document.querySelectorAll(`.${commandName}_value_${param.key}`).forEach(cb => {
                                 cb.checked = selectedValues.includes(cb.value);
                             });
-                            updateDefaultOptionPresetState(cmdKey, param.key);
+                            updateDefaultOptionPresetState(commandName, param.key);
                         }
                     });
                 }
 
-                setGroupExpanded(cmdKey, "targets", !!state[cmdKey].expandedTargets);
-                setGroupExpanded(cmdKey, "params", !!state[cmdKey].expandedParams);
+                setGroupExpanded(commandName, "targets", !!state[commandName].expandedTargets);
+                setGroupExpanded(commandName, "params", !!state[commandName].expandedParams);
             });
 
             updateAllParentCheckboxes();
@@ -830,8 +830,8 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
             container.innerHTML = "";
             const targetVarNames = document.querySelectorAll(".target-var-name");
 
-            commands.forEach(cmd => {
-                const cmdKey = cmd.command;
+            commandDefinition.forEach(cmd => {
+                const commandName = cmd.commandName;
                 const div = document.createElement("div");
                 div.className = "cmd-block";
 
@@ -840,33 +840,33 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                         <label>
                             <input type="checkbox"
                                    class="cmd-toggle"
-                                   data-cmd="${cmdKey}"
-                                   onchange="toggleAllTargetsForCommand('${cmdKey}', this)">
-                            ${cmdKey}
+                                   data-cmd="${commandName}"
+                                   onchange="toggleAllTargetsForCommand('${commandName}', this)">
+                            ${commandName}
                         </label>
 
                         <button type="button"
                                 class="collapse-toggle"
                                 aria-expanded="false"
-                                onclick="toggleGroup('${cmdKey}', 'targets')"
-                                data-cmd="${cmdKey}"
+                                onclick="toggleGroup('${commandName}', 'targets')"
+                                data-cmd="${commandName}"
                                 data-group="targets">
-                            <span id="chevron_targets_${cmdKey}" class="chevron">▶</span>
+                            <span id="chevron_targets_${commandName}" class="chevron">▶</span>
                             対象
                         </button>
 
                         <button type="button"
                                 class="collapse-toggle"
                                 aria-expanded="false"
-                                onclick="toggleGroup('${cmdKey}', 'params')"
-                                data-cmd="${cmdKey}"
+                                onclick="toggleGroup('${commandName}', 'params')"
+                                data-cmd="${commandName}"
                                 data-group="params">
-                            <span id="chevron_params_${cmdKey}" class="chevron">▶</span>
+                            <span id="chevron_params_${commandName}" class="chevron">▶</span>
                             パラメーター
                         </button>
                     </div>
 
-                    <div id="targetGroup_${cmdKey}" class="target-group">
+                    <div id="targetGroup_${commandName}" class="target-group">
                 `;
 
                 targetVarNames.forEach((input, i) => {
@@ -876,9 +876,9 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                         html += `
                             <label>
                                 <input type="checkbox"
-                                       class="${cmdKey}_target"
+                                       class="${commandName}_target"
                                        value="${i}"
-                                       onchange="updateParentCheckbox('${cmdKey}')">
+                                       onchange="updateParentCheckbox('${commandName}')">
                                 ${name}
                             </label>
                         `;
@@ -887,7 +887,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
 
                 html += `
                     </div>
-                    <div id="paramGroup_${cmdKey}" class="param-group">
+                    <div id="paramGroup_${commandName}" class="param-group">
                 `;
 
                 const switchParams = (cmd.parameters || []).filter(
@@ -898,7 +898,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                         html += `
                             <label>
                                 <input type="checkbox"
-                                       class="${cmdKey}_param"
+                                       class="${commandName}_param"
                                        value="${param.key}">
                                 ${param.key}
                             </label>
@@ -920,9 +920,9 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                                         <label>
                                             <input type="checkbox"
                                                    class="param-default-preset"
-                                                   data-cmd="${cmdKey}"
+                                                   data-cmd="${commandName}"
                                                    data-param="${param.key}"
-                                                   onchange="toggleDefaultOptionPreset('${cmdKey}', '${param.key}', this)">
+                                                   onchange="toggleDefaultOptionPreset('${commandName}', '${param.key}', this)">
                                             <span>
                                                 <span>Default Preset</span>
                                                 <span class="param-default-preset-caption">(${defaultPresetOptionList})</span>
@@ -943,9 +943,9 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                                     html += `
                                         <label class="param-option">
                                             <input type="checkbox"
-                                                   class="${cmdKey}_value_${param.key}"
+                                                   class="${commandName}_value_${param.key}"
                                                    value="${option}"
-                                                   onchange="updateDefaultOptionPresetState('${cmdKey}', '${param.key}')">
+                                                   onchange="updateDefaultOptionPresetState('${commandName}', '${param.key}')">
                                             <span class="param-option-text" title="${option}">${option}</span>
                                         </label>
                                     `;
@@ -953,9 +953,9 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                                     html += `
                                         <label class="param-option">
                                             <input type="checkbox"
-                                                   class="${cmdKey}_value_${param.key}"
+                                                   class="${commandName}_value_${param.key}"
                                                    value="${option.value}"
-                                                   onchange="updateDefaultOptionPresetState('${cmdKey}', '${param.key}')">
+                                                   onchange="updateDefaultOptionPresetState('${commandName}', '${param.key}')">
                                             <span class="param-option-text" title="${option.label || option.value}">${option.label || option.value}</span>
                                         </label>
                                     `;
@@ -1026,7 +1026,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
 
         // Returns a parameter definition by command and parameter key.
         function getParameterDefinition(commandName, parameterKey) {
-            const commandDef = commands.find(cmd => cmd.command === commandName);
+            const commandDef = commandDefinition.find(cmd => cmd.commandName === commandName);
             if (!commandDef || !Array.isArray(commandDef.parameters)) return null;
 
             return commandDef.parameters.find(param => param.key === parameterKey) || null;
@@ -1232,8 +1232,8 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
 
         // Collects selected switch parameters and parameter values for a command.
         function collectSelectedParams(commandDef) {
-            const cmdKey = commandDef.command;
-            const selectedSwitchKeys = Array.from(document.querySelectorAll(`.${cmdKey}_param:checked`))
+            const commandName = commandDef.commandName;
+            const selectedSwitchKeys = Array.from(document.querySelectorAll(`.${commandName}_param:checked`))
                 .map(cb => cb.value);
             const selectedParams = {
                 switch: [],
@@ -1263,11 +1263,11 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                 }
 
                 const isMandatory = param.isMandatory !== false;
-                const selectedValues = Array.from(document.querySelectorAll(`.${cmdKey}_value_${param.key}:checked`))
+                const selectedValues = Array.from(document.querySelectorAll(`.${commandName}_value_${param.key}:checked`))
                     .map(cb => cb.value);
 
                 if (isMandatory && selectedValues.length === 0) {
-                    alert(`${commandDef.command} は ${param.key} の選択が必須です。`);
+                    alert(`${commandDef.commandName} は ${param.key} の選択が必須です。`);
                     return null;
                 }
 
@@ -1298,8 +1298,8 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
             const selectedMultiCheckboxParams = selectedParamsByType.multiCheckbox || {};
             const selectedMultiCheckboxSplitParams = selectedParamsByType.multiCheckboxSplit || {};
 
-            const commandName = commandDef.command || commandDef.Command;
-            const fileNamePrefix = getfileNamePrefixFromCommand(commandDef.command);
+            const commandName = commandDef.commandName || commandDef.CommandName;
+            const fileNamePrefix = getfileNamePrefixFromCommand(commandDef.commandName);
             const bracedTargetVarName = "${" + targetVarName + "}";
             const switchSplitSuffix = selectedSwitchSplitParams.length > 0 ? `_${selectedSwitchSplitParams.map(param => param.replace(/^-+/, "")).join("_")}` : "";
             const varNameInFileName = !keepVarNameInFileName
@@ -1317,7 +1317,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                 .join("");
             const getVariantValue = key => selectedMultiCheckboxSplitParams[key] || "";
 
-            if (commandDef.command === "Get-Mailbox") {
+            if (commandDef.commandName === "Get-Mailbox") {
                 const mailboxSwitchParams = selectedAllSwitchParams.includes("-IncludeInactiveMailbox")
                     && (
                         selectedAllSwitchParams.includes("-SoftDeletedMailbox")
@@ -1349,7 +1349,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                 return `${commandName} $${targetVarName}${mailboxSwitchParamText} | ${EXPORT_CLIXML_ENCODING} "${outputFile}"`;
             }
 
-            if (commandDef.command === "Get-MailboxFolderStatistics") {
+            if (commandDef.commandName === "Get-MailboxFolderStatistics") {
                 const folderScopeValue = getVariantValue("-FolderScope");
                 const folderScopeParam = folderScopeValue ? ` -FolderScope ${folderScopeValue}` : "";
                 const folderScopeSuffix = folderScopeValue ? `_${folderScopeValue}` : "";
@@ -1358,7 +1358,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                 return `${commandName} $${targetVarName}${folderScopeParam}${switchParamText}${multiCheckboxParamText} | ${EXPORT_CLIXML_ENCODING} "${outputFile}"`;
             }
 
-            if (commandDef.command === "Export-MailboxDiagnosticLogs") {
+            if (commandDef.commandName === "Export-MailboxDiagnosticLogs") {
                 const componentName = getVariantValue("-ComponentName");
                 const componentParam = componentName ? ` -ComponentName ${componentName}` : "";
                 const fileSuffix = componentName ? `_${componentName}` : "";
@@ -1367,7 +1367,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                 return `${commandName} $${targetVarName}${componentParam}${switchParamText}${multiCheckboxParamText} | ${EXPORT_CLIXML_ENCODING} "${outputFile}"`;
             }
 
-            if (commandDef.command === "Get-MailboxFolderPermission") {
+            if (commandDef.commandName === "Get-MailboxFolderPermission") {
                 const folder = getVariantValue("Folder");
                 const pairedEnglish = getPairedEnglishFolderName(commandDef, folder);
                 const englishFolderName = pairedEnglish || folder;
@@ -1387,19 +1387,19 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                 return commandLine;
             }
 
-            if (commandDef.command === "Get-InboxRule") {
+            if (commandDef.commandName === "Get-InboxRule") {
                 const outputFile = `${fileNamePrefix}${varNameSegment}${switchSplitSuffix}.xml`;
 
                 return `${commandName} -Mailbox $${targetVarName}${switchParamText}${multiCheckboxParamText} | ${EXPORT_CLIXML_ENCODING} "${outputFile}"`;
             }
 
-            if (commandDef.command === "Get-MgUser" || commandDef.command === "Get-MgUserLicenseDetail") {
+            if (commandDef.commandName === "Get-MgUser" || commandDef.commandName === "Get-MgUserLicenseDetail") {
                 const outputFile = `${fileNamePrefix}${varNameSegment}${switchSplitSuffix}.xml`;
 
                 return `${commandName} -UserId $${targetVarName}${switchParamText}${multiCheckboxParamText} | ${EXPORT_CLIXML_ENCODING} "${outputFile}"`;
             }
 
-            if (commandDef.command === "Get-UnifiedGroupLinks") {
+            if (commandDef.commandName === "Get-UnifiedGroupLinks") {
                 const linkTypeValue = getVariantValue("-LinkType");
                 const linkTypeParam = linkTypeValue ? ` -LinkType ${linkTypeValue}` : "";
                 const linkTypeSuffix = linkTypeValue ? `_${linkTypeValue}` : "";
@@ -1479,8 +1479,8 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
 
         // Generates the output chunk for one command across all selected targets.
         function buildCommandOutputChunk(commandDef, names) {
-            const cmdKey = commandDef.command;
-            const enabled = document.querySelector(`.cmd-toggle[data-cmd="${cmdKey}"]`);
+            const commandName = commandDef.commandName;
+            const enabled = document.querySelector(`.cmd-toggle[data-cmd="${commandName}"]`);
 
             if (!enabled || (!enabled.checked && !enabled.indeterminate)) {
                 return "";
@@ -1493,7 +1493,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
 
             const lines = [];
 
-            document.querySelectorAll(`.${cmdKey}_target:checked`).forEach(cb => {
+            document.querySelectorAll(`.${commandName}_target:checked`).forEach(cb => {
                 const index = parseInt(cb.value, 10);
                 const targetVarName = names[index].value.trim();
                 lines.push(...buildCommandLinesForTarget(commandDef, targetVarName, selectedParams));
@@ -1544,7 +1544,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                 alert("複数の変数定義されています。\n[ファイル名に変数を含める] が無効の場合、ファイル名が重複する可能性があります。");
             }
 
-            for (const cmd of commands) {
+            for (const cmd of commandDefinition) {
                 const chunk = buildCommandOutputChunk(cmd, targetVarNames);
                 if (chunk === null) {
                     return;
