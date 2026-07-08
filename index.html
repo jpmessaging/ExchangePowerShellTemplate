@@ -538,23 +538,22 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
             let guidanceText = "";
             let step = 1;
 
-            if (guidanceTypeValue === "exoSimple") {
-                guidanceText += "Exchange Online に接続した PowerShell にて以下のコマンドを実行し、デスクトップに出力された XML ファイルをお寄せください。\n\n"
+            if (guidanceTypeValue === "exoSimple" || guidanceTypeValue === "onpremSimple") {
+                switch (guidanceTypeValue) {
+                    case "exoSimple":
+                        guidanceText += "Exchange Online に接続した PowerShell にて以下のコマンドを実行し、デスクトップに出力された XML ファイルをお寄せください。\n\n"
+                        break;
+                    case "onpremSimple":
+                        guidanceText += "任意のメールボックス サーバーで起動した Exchange 管理シェルにて以下のコマンドを実行し、デスクトップに出力された XML ファイルをお寄せください。\n\n"
+                        break;
+                }
                 guidanceText += `${varDefsGuidanceText}\n`
                 guidanceText += `   cd ${exportFolderPath}\n`
                 // guidanceText += "XML ファイルの出力先は適宜変更ください。\n\n"
                 guidanceText += `${commandGuidanceText}`;
                 return guidanceText;
             }
-            else if (guidanceTypeValue === "onpremSimple") {
-                guidanceText += "任意のメールボックス サーバーで起動した Exchange 管理シェルにて以下のコマンドを実行し、デスクトップに出力された XML ファイルをお寄せください。\n\n"
-                guidanceText += `${varDefsGuidanceText}\n`
-                guidanceText += `   cd ${exportFolderPath}\n`
-                // guidanceText += "XML ファイルの出力先は適宜変更ください。\n\n"
-                guidanceText += `${commandGuidanceText}`;
-                return guidanceText;
-            }
- 
+
             switch (guidanceTypeValue) {
                 case "onprem":
                     guidanceText += ON_PREM_PREPARE_GUIDANCE_TEXT;
