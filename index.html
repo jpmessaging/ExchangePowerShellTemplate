@@ -574,6 +574,10 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
             {
                 commandName: "Get-ADObject",
                 applicable: ["onprem"]
+            },
+            {
+                commandName: "Get-ADPermission",
+                applicable: ["onprem"]
             }
         ];
 
@@ -1499,11 +1503,16 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                 return `${commandName} $${targetVarName}${linkTypeParam}${switchParamText}${multiCheckboxParamText} | ${EXPORT_CLIXML_ENCODING} "${outputFile}"`;
             }
 
-            if (commandName.startsWith("Get-AD")) {
+            if (commandDef.commandName.startsWith("Get-AD") && commandDef.commandName !== "Get-ADPermission") {
                 const ldapFilter = `"(|(UserPrincipalName=${bracedTargetVarName})(ProxyAddresses=*${bracedTargetVarName}*)(Name=${bracedTargetVarName})(DisplayName=${bracedTargetVarName})(mailNickName=${bracedTargetVarName}))"`
                 const outputFile = `${fileNamePrefix}${varNameSegment}${switchSplitSuffix}.xml`;
 
                 return `${commandName} -LDAPFilter ${ldapFilter}${switchParamText}${multiCheckboxParamText} -Properties * | ${EXPORT_CLIXML_ENCODING} "${outputFile}"`;
+            }
+            if (commandDef.commandName === "Get-ADPermission") {
+                const outputFile = `${fileNamePrefix}${varNameSegment}${switchSplitSuffix}.xml`;
+
+                return `${commandName} (Get-Mailbox $${targetVarName})[0].DistinguishedName | ${EXPORT_CLIXML_ENCODING} "${outputFile}"`;
             }
             
             const outputFile = `${fileNamePrefix}${varNameSegment}${switchSplitSuffix}.xml`;
