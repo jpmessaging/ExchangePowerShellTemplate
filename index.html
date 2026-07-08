@@ -1363,7 +1363,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                 const folderScopeSuffix = folderScopeValue ? `_${folderScopeValue}` : "";
                 const outputFile = `${fileNamePrefix}${varNameSegment}${folderScopeSuffix}${switchSplitSuffix}.xml`;
 
-                return `${commandName} ${bracedTargetVarName}${folderScopeParam}${switchParamText}${multiCheckboxParamText} | ${EXPORT_CLIXML_ENCODING} "${outputFile}"`;
+                return `${commandName} $${targetVarName}${folderScopeParam}${switchParamText}${multiCheckboxParamText} | ${EXPORT_CLIXML_ENCODING} "${outputFile}"`;
             }
 
             if (commandDef.command === "Export-MailboxDiagnosticLogs") {
