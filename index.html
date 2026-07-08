@@ -248,6 +248,31 @@
             word-break: break-word;
         }
 
+        .cmd-badge {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-left: 6px;
+            white-space: nowrap;
+        }
+
+        .cmd-badge-exo {
+            background-color: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .cmd-badge-onprem {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .cmd-badge-graph {
+            background-color: #f3e5f5;
+            color: #6a1b9a;
+        }
+
         h2 {
             margin: 10px 0 6px;
             font-size: 18px;
@@ -390,7 +415,8 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                     { key: "-SoftDeletedMailbox", type: "switch-split" },
                     { key: "-IncludeInactiveMailbox", type: "switch" },
                     { key: "-InactiveMailboxOnly", type: "switch-split" }   
-                ]
+                ],
+                applicable: ["exo", "onprem"]
             },
             {
                 commandName: "Get-MailboxStatistics",
@@ -398,7 +424,8 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                     { key: "-Archive", type: "switch-split" },
                     { key: "-IncludeMoveHistory", type: "switch" },
                     { key: "-IncludeMoveReport", type: "switch" }
-                ]
+                ],
+                applicable: ["exo", "onprem"]
             },
             {
                 commandName: "Get-MailboxFolderStatistics",
@@ -412,7 +439,8 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                         isMandatory: false,
                         options: ["All","Archive","Calendar","Contacts","ConversationHistory","DeletedItems","Drafts","Inbox","JunkEmail","Journal","LegacyArchiveJournals","ManagedCustomFolder","NonIpmRoot","Notes","Outbox","Personal","RecoverableItems","RssSubscriptions","SentItems","SyncIssues","Tasks"]
                     }
-                ]
+                ],
+                applicable: ["exo", "onprem"]
             },
             {
                 commandName: "Get-MailboxFolderPermission",
@@ -428,19 +456,23 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                             { value: "連絡先", english: "Contacts", label: "連絡先 (Contacts)" }
                         ]
                     }
-                ]
+                ],
+                applicable: ["exo", "onprem"]
             },
             {
-                commandName: "Get-MailboxPermission"
+                commandName: "Get-MailboxPermission",
+                applicable: ["exo", "onprem"]
             },
             {
-                commandName: "Get-RecipientPermission"
+                commandName: "Get-RecipientPermission",
+                applicable: ["exo"]
             },
             {
                 commandName: "Get-CASMailbox",
                 parameters: [
                     { key: "-ActiveSyncDebugLogging", type: "switch" }
-                ]
+                ],
+                applicable: ["exo", "onprem"]
             },
             {
                 commandName: "Export-MailboxDiagnosticLogs",
@@ -451,37 +483,47 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                         isMandatory: true,
                         options: ["AcceptCalendarSharingInvite", "AttendeeListReplicationAssistant", "AttendeesProperty", "BirthdayCalendar", "CalendarActiveSharees", "CalendarAssistant", "CalendarPermissions", "CalendarRepair", "CalendarReplication", "CalendarSharingEmailSync", "CalendarSharingInconsistencyRepair", "CalendarSharingInconsistencyValidator", "CalendarSharingInitialView", "CalendarSharingInvite", "CalendarSharingLocalFolder", "ClearCalendar", "DefaultViewIndexer", "DelegateRulesManagement", "FreeBusyPublishingAssistantQuickLog", "HoldTracking", "InternalCalendarSharingMigration", "InternetCalendar", "MeetingMessageProcessingAgent", "MFN", "MRM", "OnlineMeetings", "OOFRules", "RBA", "RemindersAssistant", "ReplicateAttendees", "SearchFoldersMigration", "SharedInTombstones", "Sharing", "SharingMigrationAssistant", "SharingSyncAssistant", "SmartTaggingFai", "SubstrateHoldTracking", "SweepRules", "TimeProfile", "TriggerSharingSyncAsNeeded", "VisibleMeetingMessageProcessing"]
                     }
-                ]
+                ],
+                applicable: ["exo", "onprem"]
             },
             {
-                commandName: "Get-User"
+                commandName: "Get-User",
+                applicable: ["exo", "onprem"]
             },
             {
-                commandName: "Get-Recipient"
+                commandName: "Get-Recipient",
+                applicable: ["exo", "onprem"]
             },
             {
-                commandName: "Get-MailUser"
+                commandName: "Get-MailUser",
+                applicable: ["exo", "onprem"]
             },
             {
-                commandName: "Get-MailContact"
+                commandName: "Get-MailContact",
+                applicable: ["exo", "onprem"]
             },
             {
-                commandName: "Get-CalendarProcessing"
+                commandName: "Get-CalendarProcessing",
+                applicable: ["exo", "onprem"]
             },
             {
                 commandName: "Get-InboxRule",
                 parameters: [
                     { key: "-IncludeHidden", type: "switch" }
-                ]
+                ],
+                applicable: ["exo", "onprem"]
             },
             {
-                commandName: "Get-DistributionGroup"
+                commandName: "Get-DistributionGroup",
+                applicable: ["exo", "onprem"]
             },
             {
-                commandName: "Get-DistributionGroupMember"
+                commandName: "Get-DistributionGroupMember",
+                applicable: ["exo", "onprem"]
             },
             {
-                commandName: "Get-UnifiedGroup"
+                commandName: "Get-UnifiedGroup",
+                applicable: ["exo"]
             },
             {
                 commandName: "Get-UnifiedGroupLinks",
@@ -492,11 +534,13 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                         isMandatory: true,
                         options: ["Members", "Owners", "Subscribers"]
                     }
-                ]
+                ],
+                applicable: ["exo"]
             }
             ,
             {
-                commandName: "Get-Group"
+                commandName: "Get-Group",
+                applicable: ["exo", "onprem"]
             },
             {
                 commandName: "Get-MgUser",
@@ -508,22 +552,28 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                         defaultSelectedOptions: ["Id", "DisplayName", "UserPrincipalName", "Mail", "ServiceProvisioningErrors", "AssignedLicenses", "LicenseAssignmentStates", "OnPremisesLastSyncDateTime", "OnPremisesImmutableId"],
                         options: ["AboutMe","AccountEnabled","Activities","AgeGroup","AgreementAcceptances","AppRoleAssignments","AssignedLicenses","AssignedPlans","Authentication","AuthorizationInfo","Birthday","BusinessPhones","Calendar","CalendarGroups","CalendarView","Calendars","Chats","City","CloudClipboard","CompanyName","ConsentProvidedForMinor","ContactFolders","Contacts","Country","CreatedDateTime","CreatedObjects","CreationType","CustomSecurityAttributes","DeletedDateTime","Department","DeviceManagementTroubleshootingEvents","DirectReports","DisplayName","Drive","Drives","EmployeeExperience","EmployeeHireDate","EmployeeId","EmployeeLeaveDateTime","EmployeeOrgData","EmployeeType","Events","Extensions","ExternalUserState","ExternalUserStateChangeDateTime","FaxNumber","FollowedSites","GivenName","HireDate","Id","Identities","ImAddresses","InferenceClassification","Insights","Interests","IsManagementRestricted","IsResourceAccount","JobTitle","JoinedTeams","LastPasswordChangeDateTime","LegalAgeGroupClassification","LicenseAssignmentStates","LicenseDetails","Mail","MailFolders","MailNickname","ManagedAppRegistrations","ManagedDevices","Manager","MemberOf","Messages","MobilePhone","MySite","Oauth2PermissionGrants","OfficeLocation","OnPremisesDistinguishedName","OnPremisesDomainName","OnPremisesExtensionAttributes","OnPremisesImmutableId","OnPremisesLastSyncDateTime","OnPremisesProvisioningErrors","OnPremisesSamAccountName","OnPremisesSecurityIdentifier","OnPremisesSyncEnabled","OnPremisesUserPrincipalName","Onenote","OnlineMeetings","OtherMails","Outlook","OwnedDevices","OwnedObjects","PasswordPolicies","PasswordProfile","PastProjects","People","PermissionGrants","Photo","Photos","Planner","PostalCode","PreferredDataLocation","PreferredLanguage","PreferredName","Presence","Print","ProvisionedPlans","ProxyAddresses","RegisteredDevices","Responsibilities","Schools","ScopedRoleMemberOf","SecurityIdentifier","ServiceProvisioningErrors","Settings","ShowInAddressList","SignInActivity","SignInSessionsValidFromDateTime","Skills","Solutions","Sponsors","State","StreetAddress","Surname","Teamwork","Todo","TransitiveMemberOf","UsageLocation","UserPrincipalName","UserType","AdditionalProperties"]
                     }
-                ]
+                ],
+                applicable: ["graph"]
             },
             {
-                commandName: "Get-MgUserLicenseDetail"
+                commandName: "Get-MgUserLicenseDetail",
+                applicable: ["graph"]
             },
             {
-                commandName: "Get-RemoteMailbox"
+                commandName: "Get-RemoteMailbox",
+                applicable: ["onprem"]
             },
             {
-                commandName: "Get-ADUser"
+                commandName: "Get-ADUser",
+                applicable: ["onprem"]
             },
             {
-                commandName: "Get-ADGroup"
+                commandName: "Get-ADGroup",
+                applicable: ["onprem"]
             },
             {
-                commandName: "Get-ADObject"
+                commandName: "Get-ADObject",
+                applicable: ["onprem"]
             }
         ];
 
@@ -678,6 +728,40 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
             });
 
             parentCheckbox.indeterminate = false;
+            updateGuidanceTypeIfNeeded();
+        }
+
+        // Checks if all checked commands support common guidance types and updates accordingly with priority: exo > onprem > graph.
+        function updateGuidanceTypeIfNeeded() {
+            const checkedCommands = commands.filter(cmd => {
+                const toggle = document.querySelector(`.cmd-toggle[data-cmd="${cmd.command}"]`);
+                return toggle && (toggle.checked || toggle.indeterminate);
+            });
+
+            if (checkedCommands.length === 0) {
+                return;
+            }
+
+            const guidanceTypeSelect = document.getElementById("guidanceType");
+            if (!guidanceTypeSelect) {
+                return;
+            }
+
+            // Find common applicable types across all checked commands
+            const commonApplicable = checkedCommands.reduce((common, cmd) => {
+                const cmdSet = new Set(cmd.applicable || []);
+                return common.filter(type => cmdSet.has(type));
+            }, [...(checkedCommands[0]?.applicable || [])]);
+
+            // Apply priority: exo > onprem > graph
+            const priorityOrder = ["exo", "onprem", "graph"];
+            for (const guidanceType of priorityOrder) {
+                if (commonApplicable.includes(guidanceType)) {
+                    guidanceTypeSelect.value = guidanceType;
+                    guidanceTypeSelect.dispatchEvent(new Event('change'));
+                    return;
+                }
+            }
         }
 
         // Applies expanded or collapsed UI state to a specific command section.
@@ -835,6 +919,13 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                 const div = document.createElement("div");
                 div.className = "cmd-block";
 
+                let badgeHtml = "";
+                if (cmd.applicable && Array.isArray(cmd.applicable)) {
+                    badgeHtml = cmd.applicable
+                        .map(type => `<span class="cmd-badge cmd-badge-${type}">${type.toUpperCase()}</span>`)
+                        .join("");
+                }
+
                 let html = `
                     <div class="cmd-header">
                         <label>
@@ -842,7 +933,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                                    class="cmd-toggle"
                                    data-cmd="${commandName}"
                                    onchange="toggleAllTargetsForCommand('${commandName}', this)">
-                            ${commandName}
+                            ${commandName}${badgeHtml}
                         </label>
 
                         <button type="button"
@@ -1287,8 +1378,8 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
         function buildCommandLine(commandDef, targetVarName, selectedParamsByType) {
             const EXPORT_CLIXML_ENCODING = "Export-CliXml -Encoding UTF8";
             
-            const keepVarNameInFileName = !!(document.getElementById("keepVarNameInFileName") && document.getElementById("keepVarNameInFileName").checked);
-            const expandVarNameInFileName = !!(document.getElementById("expandVarNameInFileName") && document.getElementById("expandVarNameInFileName").checked);
+            const keepVarNameInFileName = document.getElementById("keepVarNameInFileName")?.checked ?? false;
+            const expandVarNameInFileName = document.getElementById("expandVarNameInFileName")?.checked ?? false;
             const premiseSuffix = getPremiseSuffixForFileName();
             const selectedAllSwitchParams = [
                 ...(selectedParamsByType.switch || []),
@@ -1538,10 +1629,40 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                 }
             }
 
-            const keepVarNameInFileName = document.getElementById("keepVarNameInFileName");
-            const isKeepVarNameInFileNameEnabled = !!(keepVarNameInFileName && keepVarNameInFileName.checked);
+            const isKeepVarNameInFileNameEnabled = document.getElementById("keepVarNameInFileName")?.checked ?? false;
             if (targetVarNames.length > 1 && !isKeepVarNameInFileNameEnabled) {
                 alert("複数の変数定義されています。\n[ファイル名に変数を含める] が無効の場合、ファイル名が重複する可能性があります。");
+            }
+            
+            // Check if selected commands are applicable to the selected guidance type
+            const guidanceTypeValue = document.getElementById("guidanceType") ? document.getElementById("guidanceType").value : "exo";
+            
+            // Treat exoSimple/onpremSimple as exo/onprem respectively
+            const applicableGuidanceType = guidanceTypeValue === "exoSimple" ? "exo"
+                                         : guidanceTypeValue === "onpremSimple" ? "onprem"
+                                         : guidanceTypeValue;
+
+            const guidanceTypeMap = {
+                "exo": "Exchange Online",
+                "exoSimple": "Exchange Online",
+                "onprem": "オンプレミス",
+                "onpremSimple": "オンプレミス",
+                "graph": "Microsoft Graph"
+            };
+
+            for (const cmd of commandDefinition) {
+                const cmdKey = cmd.command;
+                const enabledCheckbox = document.querySelector(`.cmd-toggle[data-cmd="${cmdKey}"]`);
+                
+                // Check if the command is selected
+                if (!enabledCheckbox || (!enabledCheckbox.checked && !enabledCheckbox.indeterminate)) {
+                    continue;
+                }
+                
+                // If applicable property exists, check if the guidance type is included
+                if (cmd.applicable && !cmd.applicable.includes(applicableGuidanceType)) {
+                    alert(`${cmd.command} は ${guidanceTypeMap[guidanceTypeValue]} で利用不可です。`);
+                }
             }
 
             for (const cmd of commandDefinition) {
