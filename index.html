@@ -528,8 +528,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
         ];
 
         function generateGuidanceSteps(varDefsText, commandText) {
-            const guidanceTypeSelect = document.getElementById("guidanceType");
-            const guidanceTypeValue = guidanceTypeSelect ? guidanceTypeSelect.value : "exo";
+            const guidanceTypeValue = document.getElementById("guidanceType")?.value ?? "exo";
             const includeTranscript = document.getElementById("includeTranscript");
             const transcriptEnabled = !!(includeTranscript && includeTranscript.checked);
             const exportToDesktop = document.getElementById("exportToDesktop");
@@ -1085,15 +1084,12 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
             const desktopCheckbox = document.getElementById("exportToDesktop");
             const exportPathInput = document.getElementById("exportPath");
             const includeGuidanceText = document.getElementById("includeGuidanceText");
-            const guidanceTypeSelect = document.getElementById("guidanceType");
+            const guidanceTypeValue = document.getElementById("guidanceType")?.value ?? "exo";
 
             if (!desktopCheckbox || !exportPathInput) return;
 
             const guidanceDisabled = !!(includeGuidanceText && !includeGuidanceText.checked);
-            const simpleGuidanceSelected = !!(
-                guidanceTypeSelect
-                && (guidanceTypeSelect.value === "exoSimple" || guidanceTypeSelect.value === "onpremSimple")
-            );
+            const simpleGuidanceSelected = guidanceTypeValue === "exoSimple" || guidanceTypeValue === "onpremSimple";
 
             desktopCheckbox.disabled = guidanceDisabled || simpleGuidanceSelected;
             exportPathInput.disabled = guidanceDisabled || simpleGuidanceSelected || desktopCheckbox.checked;
@@ -1102,19 +1098,17 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
         // Enables or disables guidance-type radio options based on guidance-text option.
         function toggleGuidanceTypeOptions() {
             const includeGuidanceText = document.getElementById("includeGuidanceText");
-            const guidanceTypeSelect = document.getElementById("guidanceType");
+            const guidanceTypeElement = document.getElementById("guidanceType");
             const includeTranscript = document.getElementById("includeTranscript");
             const premiseSuffix = document.getElementById("premiseSuffix");
-            const selectedGuidanceTypeValue = guidanceTypeSelect ? guidanceTypeSelect.value : "exo";
+            const selectedGuidanceTypeValue = guidanceTypeElement?.value ?? "exo";
 
-            if (!includeGuidanceText || !guidanceTypeSelect || !includeTranscript || !premiseSuffix) return;
+            if (!includeGuidanceText || !guidanceTypeElement || !includeTranscript || !premiseSuffix) return;
 
             const disabled = !includeGuidanceText.checked;
-            const simpleGuidanceSelected = !!(
-                selectedGuidanceTypeValue === "exoSimple" || selectedGuidanceTypeValue === "onpremSimple"
-            );
+            const simpleGuidanceSelected = selectedGuidanceTypeValue === "exoSimple" || selectedGuidanceTypeValue === "onpremSimple";
             const graphGuidanceSelected = selectedGuidanceTypeValue === "graph";
-            guidanceTypeSelect.disabled = disabled;
+            guidanceTypeElement.disabled = disabled;
             includeTranscript.disabled = disabled || simpleGuidanceSelected;
             premiseSuffix.disabled = disabled || graphGuidanceSelected;
             toggleExportPathInput();
@@ -1192,8 +1186,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
         // Returns filename suffix for selected guidance type when premiseSuffix is enabled.
         function getPremiseSuffixForFileName() {
             const premiseSuffix = document.getElementById("premiseSuffix");
-            const guidanceTypeSelect = document.getElementById("guidanceType");
-            const guidanceTypeValue = guidanceTypeSelect ? guidanceTypeSelect.value : "exo";
+            const guidanceTypeValue = document.getElementById("guidanceType")?.value ?? "exo";
 
             if (!premiseSuffix || !premiseSuffix.checked) {
                 return "";
@@ -1592,9 +1585,9 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
             if (includeGuidanceText) {
                 includeGuidanceText.addEventListener("change", toggleGuidanceTypeOptions);
             }
-            const guidanceTypeSelect = document.getElementById("guidanceType");
-            if (guidanceTypeSelect) {
-                guidanceTypeSelect.addEventListener("change", toggleGuidanceTypeOptions);
+            const guidanceTypeElement = document.getElementById("guidanceType");
+            if (guidanceTypeElement) {
+                guidanceTypeElement.addEventListener("change", toggleGuidanceTypeOptions);
             }
             renderCommands();
         };
