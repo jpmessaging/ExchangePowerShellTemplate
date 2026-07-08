@@ -390,7 +390,8 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                     { key: "-SoftDeletedMailbox", type: "switch-split" },
                     { key: "-IncludeInactiveMailbox", type: "switch" },
                     { key: "-InactiveMailboxOnly", type: "switch-split" }   
-                ]
+                ],
+                applicable: ["exo", "onprem"]
             },
             {
                 command: "Get-MailboxStatistics",
@@ -398,7 +399,8 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                     { key: "-Archive", type: "switch-split" },
                     { key: "-IncludeMoveHistory", type: "switch" },
                     { key: "-IncludeMoveReport", type: "switch" }
-                ]
+                ],
+                applicable: ["exo", "onprem"]
             },
             {
                 command: "Get-MailboxFolderStatistics",
@@ -412,7 +414,8 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                         isMandatory: false,
                         options: ["All","Archive","Calendar","Contacts","ConversationHistory","DeletedItems","Drafts","Inbox","JunkEmail","Journal","LegacyArchiveJournals","ManagedCustomFolder","NonIpmRoot","Notes","Outbox","Personal","RecoverableItems","RssSubscriptions","SentItems","SyncIssues","Tasks"]
                     }
-                ]
+                ],
+                applicable: ["exo", "onprem"]
             },
             {
                 command: "Get-MailboxFolderPermission",
@@ -428,19 +431,23 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                             { value: "連絡先", english: "Contacts", label: "連絡先 (Contacts)" }
                         ]
                     }
-                ]
+                ],
+                applicable: ["exo", "onprem"]
             },
             {
-                command: "Get-MailboxPermission"
+                command: "Get-MailboxPermission",
+                applicable: ["exo", "onprem"]
             },
             {
-                command: "Get-RecipientPermission"
+                command: "Get-RecipientPermission",
+                applicable: ["exo"]
             },
             {
                 command: "Get-CASMailbox",
                 parameters: [
                     { key: "-ActiveSyncDebugLogging", type: "switch" }
-                ]
+                ],
+                applicable: ["exo", "onprem"]
             },
             {
                 command: "Export-MailboxDiagnosticLogs",
@@ -451,37 +458,47 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                         isMandatory: true,
                         options: ["AcceptCalendarSharingInvite", "AttendeeListReplicationAssistant", "AttendeesProperty", "BirthdayCalendar", "CalendarActiveSharees", "CalendarAssistant", "CalendarPermissions", "CalendarRepair", "CalendarReplication", "CalendarSharingEmailSync", "CalendarSharingInconsistencyRepair", "CalendarSharingInconsistencyValidator", "CalendarSharingInitialView", "CalendarSharingInvite", "CalendarSharingLocalFolder", "ClearCalendar", "DefaultViewIndexer", "DelegateRulesManagement", "FreeBusyPublishingAssistantQuickLog", "HoldTracking", "InternalCalendarSharingMigration", "InternetCalendar", "MeetingMessageProcessingAgent", "MFN", "MRM", "OnlineMeetings", "OOFRules", "RBA", "RemindersAssistant", "ReplicateAttendees", "SearchFoldersMigration", "SharedInTombstones", "Sharing", "SharingMigrationAssistant", "SharingSyncAssistant", "SmartTaggingFai", "SubstrateHoldTracking", "SweepRules", "TimeProfile", "TriggerSharingSyncAsNeeded", "VisibleMeetingMessageProcessing"]
                     }
-                ]
+                ],
+                applicable: ["exo", "onprem"]
             },
             {
-                command: "Get-User"
+                command: "Get-User",
+                applicable: ["exo", "onprem"]
             },
             {
-                command: "Get-Recipient"
+                command: "Get-Recipient",
+                applicable: ["exo", "onprem"]
             },
             {
-                command: "Get-MailUser"
+                command: "Get-MailUser",
+                applicable: ["exo", "onprem"]
             },
             {
-                command: "Get-MailContact"
+                command: "Get-MailContact",
+                applicable: ["exo", "onprem"]
             },
             {
-                command: "Get-CalendarProcessing"
+                command: "Get-CalendarProcessing",
+                applicable: ["exo", "onprem"]
             },
             {
                 command: "Get-InboxRule",
                 parameters: [
                     { key: "-IncludeHidden", type: "switch" }
-                ]
+                ],
+                applicable: ["exo", "onprem"]
             },
             {
-                command: "Get-DistributionGroup"
+                command: "Get-DistributionGroup",
+                applicable: ["exo", "onprem"]
             },
             {
-                command: "Get-DistributionGroupMember"
+                command: "Get-DistributionGroupMember",
+                applicable: ["exo", "onprem"]
             },
             {
-                command: "Get-UnifiedGroup"
+                command: "Get-UnifiedGroup",
+                applicable: ["exo"]
             },
             {
                 command: "Get-UnifiedGroupLinks",
@@ -492,11 +509,13 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                         isMandatory: true,
                         options: ["Members", "Owners", "Subscribers"]
                     }
-                ]
+                ],
+                applicable: ["exo"]
             }
             ,
             {
-                command: "Get-Group"
+                command: "Get-Group",
+                applicable: ["exo", "onprem"]
             },
             {
                 command: "Get-MgUser",
@@ -508,22 +527,28 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                         defaultSelectedOptions: ["Id", "DisplayName", "UserPrincipalName", "Mail", "ServiceProvisioningErrors", "AssignedLicenses", "LicenseAssignmentStates", "OnPremisesLastSyncDateTime", "OnPremisesImmutableId"],
                         options: ["AboutMe","AccountEnabled","Activities","AgeGroup","AgreementAcceptances","AppRoleAssignments","AssignedLicenses","AssignedPlans","Authentication","AuthorizationInfo","Birthday","BusinessPhones","Calendar","CalendarGroups","CalendarView","Calendars","Chats","City","CloudClipboard","CompanyName","ConsentProvidedForMinor","ContactFolders","Contacts","Country","CreatedDateTime","CreatedObjects","CreationType","CustomSecurityAttributes","DeletedDateTime","Department","DeviceManagementTroubleshootingEvents","DirectReports","DisplayName","Drive","Drives","EmployeeExperience","EmployeeHireDate","EmployeeId","EmployeeLeaveDateTime","EmployeeOrgData","EmployeeType","Events","Extensions","ExternalUserState","ExternalUserStateChangeDateTime","FaxNumber","FollowedSites","GivenName","HireDate","Id","Identities","ImAddresses","InferenceClassification","Insights","Interests","IsManagementRestricted","IsResourceAccount","JobTitle","JoinedTeams","LastPasswordChangeDateTime","LegalAgeGroupClassification","LicenseAssignmentStates","LicenseDetails","Mail","MailFolders","MailNickname","ManagedAppRegistrations","ManagedDevices","Manager","MemberOf","Messages","MobilePhone","MySite","Oauth2PermissionGrants","OfficeLocation","OnPremisesDistinguishedName","OnPremisesDomainName","OnPremisesExtensionAttributes","OnPremisesImmutableId","OnPremisesLastSyncDateTime","OnPremisesProvisioningErrors","OnPremisesSamAccountName","OnPremisesSecurityIdentifier","OnPremisesSyncEnabled","OnPremisesUserPrincipalName","Onenote","OnlineMeetings","OtherMails","Outlook","OwnedDevices","OwnedObjects","PasswordPolicies","PasswordProfile","PastProjects","People","PermissionGrants","Photo","Photos","Planner","PostalCode","PreferredDataLocation","PreferredLanguage","PreferredName","Presence","Print","ProvisionedPlans","ProxyAddresses","RegisteredDevices","Responsibilities","Schools","ScopedRoleMemberOf","SecurityIdentifier","ServiceProvisioningErrors","Settings","ShowInAddressList","SignInActivity","SignInSessionsValidFromDateTime","Skills","Solutions","Sponsors","State","StreetAddress","Surname","Teamwork","Todo","TransitiveMemberOf","UsageLocation","UserPrincipalName","UserType","AdditionalProperties"]
                     }
-                ]
+                ],
+                applicable: ["graph"]
             },
             {
-                command: "Get-MgUserLicenseDetail"
+                command: "Get-MgUserLicenseDetail",
+                applicable: ["graph"]
             },
             {
-                command: "Get-RemoteMailbox"
+                command: "Get-RemoteMailbox",
+                applicable: ["onprem"]
             },
             {
-                command: "Get-ADUser"
+                command: "Get-ADUser",
+                applicable: ["onprem"]
             },
             {
-                command: "Get-ADGroup"
+                command: "Get-ADGroup",
+                applicable: ["onprem"]
             },
             {
-                command: "Get-ADObject"
+                command: "Get-ADObject",
+                applicable: ["onprem"]
             }
         ];
 
