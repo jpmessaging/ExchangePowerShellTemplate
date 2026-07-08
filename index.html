@@ -1320,8 +1320,8 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
         function buildCommandLine(commandDef, targetVarName, selectedParamsByType) {
             const EXPORT_CLIXML_ENCODING = "Export-CliXml -Encoding UTF8";
             
-            const keepVarNameInFileName = !!(document.getElementById("keepVarNameInFileName") && document.getElementById("keepVarNameInFileName").checked);
-            const expandVarNameInFileName = !!(document.getElementById("expandVarNameInFileName") && document.getElementById("expandVarNameInFileName").checked);
+            const keepVarNameInFileName = document.getElementById("keepVarNameInFileName")?.checked ?? false;
+            const expandVarNameInFileName = document.getElementById("expandVarNameInFileName")?.checked ?? false;
             const premiseSuffix = getPremiseSuffixForFileName();
             const selectedAllSwitchParams = [
                 ...(selectedParamsByType.switch || []),
@@ -1571,10 +1571,40 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                 }
             }
 
-            const keepVarNameInFileName = document.getElementById("keepVarNameInFileName");
-            const isKeepVarNameInFileNameEnabled = !!(keepVarNameInFileName && keepVarNameInFileName.checked);
+            const isKeepVarNameInFileNameEnabled = document.getElementById("keepVarNameInFileName")?.checked ?? false;
             if (targetVarNames.length > 1 && !isKeepVarNameInFileNameEnabled) {
                 alert("複数の変数定義されています。\n[ファイル名に変数を含める] が無効の場合、ファイル名が重複する可能性があります。");
+            }
+
+            // Check if selected commands are applicable to the selected guidance type
+            const guidanceTypeValue = document.getElementById("guidanceType") ? document.getElementById("guidanceType").value : "exo";
+            
+            // Treat exoSimple/onpremSimple as exo/onprem respectively
+            const applicableGuidanceType = guidanceTypeValue === "exoSimple" ? "exo"
+                                         : guidanceTypeValue === "onpremSimple" ? "onprem"
+                                         : guidanceTypeValue;
+
+            const guidanceTypeMap = {
+                "exo": "Exchange Online",
+                "exoSimple": "Exchange Online",
+                "onprem": "オンプレミス",
+                "onpremSimple": "オンプレミス",
+                "graph": "Microsoft Graph"
+            };
+
+            for (const cmd of commands) {
+                const cmdKey = cmd.command;
+                const enabledCheckbox = document.querySelector(`.cmd-toggle[data-cmd="${cmdKey}"]`);
+                
+                // Check if the command is selected
+                if (!enabledCheckbox || (!enabledCheckbox.checked && !enabledCheckbox.indeterminate)) {
+                    continue;
+                }
+                
+                // If applicable property exists, check if the guidance type is included
+                if (cmd.applicable && !cmd.applicable.includes(applicableGuidanceType)) {
+                    alert(`${cmd.command} は ${guidanceTypeMap[guidanceTypeValue]} で利用不可です。`);
+                }
             }
 
             for (const cmd of commands) {
