@@ -248,6 +248,31 @@
             word-break: break-word;
         }
 
+        .cmd-badge {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-left: 6px;
+            white-space: nowrap;
+        }
+
+        .cmd-badge-exo {
+            background-color: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .cmd-badge-onprem {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .cmd-badge-graph {
+            background-color: #f3e5f5;
+            color: #6a1b9a;
+        }
+
         h2 {
             margin: 10px 0 6px;
             font-size: 18px;
@@ -896,6 +921,13 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                 const div = document.createElement("div");
                 div.className = "cmd-block";
 
+                let badgeHtml = "";
+                if (cmd.applicable && Array.isArray(cmd.applicable)) {
+                    badgeHtml = cmd.applicable
+                        .map(type => `<span class="cmd-badge cmd-badge-${type}">${type.toUpperCase()}</span>`)
+                        .join("");
+                }
+
                 let html = `
                     <div class="cmd-header">
                         <label>
@@ -903,7 +935,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                                    class="cmd-toggle"
                                    data-cmd="${cmdKey}"
                                    onchange="toggleAllTargetsForCommand('${cmdKey}', this)">
-                            ${cmdKey}
+                            ${cmdKey}${badgeHtml}
                         </label>
 
                         <button type="button"
