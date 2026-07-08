@@ -733,7 +733,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
 
         // Checks if all checked commands support common guidance types and updates accordingly with priority: exo > onprem > graph.
         function updateGuidanceTypeIfNeeded() {
-            const checkedCommands = commands.filter(cmd => {
+            const checkedCommands = commandDefinition.filter(cmd => {
                 const toggle = document.querySelector(`.cmd-toggle[data-cmd="${cmd.command}"]`);
                 return toggle && (toggle.checked || toggle.indeterminate);
             });
@@ -1633,7 +1633,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
             if (targetVarNames.length > 1 && !isKeepVarNameInFileNameEnabled) {
                 alert("複数の変数定義されています。\n[ファイル名に変数を含める] が無効の場合、ファイル名が重複する可能性があります。");
             }
-            
+
             // Check if selected commands are applicable to the selected guidance type
             const guidanceTypeValue = document.getElementById("guidanceType") ? document.getElementById("guidanceType").value : "exo";
             
@@ -1651,8 +1651,8 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
             };
 
             for (const cmd of commandDefinition) {
-                const cmdKey = cmd.command;
-                const enabledCheckbox = document.querySelector(`.cmd-toggle[data-cmd="${cmdKey}"]`);
+                const commandName = cmd.commandName;
+                const enabledCheckbox = document.querySelector(`.cmd-toggle[data-cmd="${commandName}"]`);
                 
                 // Check if the command is selected
                 if (!enabledCheckbox || (!enabledCheckbox.checked && !enabledCheckbox.indeterminate)) {
@@ -1661,7 +1661,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                 
                 // If applicable property exists, check if the guidance type is included
                 if (cmd.applicable && !cmd.applicable.includes(applicableGuidanceType)) {
-                    alert(`${cmd.command} は ${guidanceTypeMap[guidanceTypeValue]} で利用不可です。`);
+                    alert(`${commandName} は ${guidanceTypeMap[guidanceTypeValue]} で利用不可です。`);
                 }
             }
 
