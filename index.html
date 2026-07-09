@@ -85,6 +85,16 @@
             background: #efefef;
         }
 
+        .collapse-toggle:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #f3f3f3;
+        }
+
+        .collapse-toggle:disabled:hover {
+            background: #f3f3f3;
+        }
+
         .chevron {
             display: inline-block;
             width: 1em;
@@ -920,6 +930,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
 
             commandDefinition.forEach(cmd => {
                 const commandName = cmd.commandName;
+                const hasParameters = Array.isArray(cmd.parameters) && cmd.parameters.length > 0;
                 const div = document.createElement("div");
                 div.className = "cmd-block";
 
@@ -955,7 +966,8 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                                 aria-expanded="false"
                                 onclick="toggleGroup('${commandName}', 'params')"
                                 data-cmd="${commandName}"
-                                data-group="params">
+                                data-group="params"
+                                ${hasParameters ? "" : "disabled aria-disabled=\"true\""}>
                             <span id="chevron_params_${commandName}" class="chevron">▶</span>
                             パラメーター
                         </button>
