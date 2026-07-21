@@ -524,6 +524,21 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                 applicable: ["exo", "onprem"]
             },
             {
+                commandName: "Get-MailboxMessageConfiguration",
+                applicable: ["exo", "onprem"]
+            },
+            {
+                commandName: "Get-MailboxRegionalConfiguration",
+                parameters: [
+                    { key: "-VerifyDefaultFolderNameLanguage", type: "switch" }
+                ],
+                applicable: ["exo", "onprem"]
+            },
+            {
+                commandName: "Get-MailboxJunkEmailConfiguration",
+                applicable: ["exo", "onprem"]
+            },
+            {
                 commandName: "Get-DistributionGroup",
                 applicable: ["exo", "onprem"]
             },
