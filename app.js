@@ -1612,7 +1612,7 @@ function generate() {
 
     const isKeepVarNameInFileNameEnabled = document.getElementById("keepVarNameInFileName")?.checked ?? false;
     if (targetVarNames.length > 1 && !isKeepVarNameInFileNameEnabled) {
-        alert("複数の変数定義されています。\n[ファイル名に変数を含める] が無効の場合、ファイル名が重複する可能性があります。");
+        alert("複数の変数が定義されています。\n[ファイル名に変数を含める] が無効の場合、ファイル名が重複する可能性があります。");
     }
 
     // Check if selected commands are applicable to the selected guidance type
