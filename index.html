@@ -499,15 +499,15 @@
                                 <input id="exportPath" class="option-path-input" value="C:\temp" oninput="handleExportPathInput(this)">
                             </div>
                         </div>
-                        <div class="option-sub">
-                            <label>
-                                <input id="premiseSuffix" type="checkbox">
-                                ファイル名に ExO / Onprem サフィックス含める
-                            </label>
-                            <div class="option-note">Mailbox_User1_ExO.xml</div>
-                            <div class="option-note">Mailbox_User1_Onprem.xml</div>
-                        </div>
                     </div>
+                    <div class="option-inline">
+                        <label>
+                            <input id="premiseSuffix" type="checkbox">
+                            ファイル名に ExO / Onprem サフィックス含める
+                        </label>
+                    </div>
+                    <div class="option-note">Mailbox_User1_ExO.xml</div>
+                    <div class="option-note">Mailbox_User1_Onprem.xml</div>
                 </div>
             </div>
 
@@ -1689,7 +1689,6 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
             const graphGuidanceSelected = selectedGuidanceTypeValue === "graph";
             guidanceTypeElement.disabled = disabled;
             includeTranscript.disabled = disabled || simpleGuidanceSelected;
-            premiseSuffix.disabled = disabled || graphGuidanceSelected;
             toggleExportPathInput();
         }
 
