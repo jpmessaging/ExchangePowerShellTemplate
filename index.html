@@ -46,15 +46,117 @@
             margin-bottom: 8px;
         }
 
+        .commands-toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            padding: 8px;
+            border: 1px solid #d6deeb;
+            border-radius: 8px;
+            background: linear-gradient(180deg, #f8fbff, #f0f6ff);
+        }
+
+        .commands-toolbar-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 6px;
+        }
+
+        .commands-toolbar-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .command-search {
+            flex: 1 1 280px;
+            min-width: 200px;
+            padding: 6px 8px;
+            border: 1px solid #b7c6de;
+            border-radius: 6px;
+        }
+
+        .toolbar-button {
+            padding: 5px 10px;
+            border: 1px solid #b8c5da;
+            border-radius: 6px;
+            background: #fff;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .toolbar-button:hover {
+            background: #f4f8ff;
+        }
+
+        .filter-chip {
+            padding: 4px 10px;
+            border: 1px solid #b6c7df;
+            border-radius: 999px;
+            background: #fff;
+            color: #314b70;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .filter-chip.active {
+            background: #e8f0ff;
+            border-color: #6f96d8;
+            color: #1f3b67;
+        }
+
+        .command-summary {
+            margin-left: auto;
+            font-size: 12px;
+            color: #2f4462;
+            white-space: nowrap;
+        }
+
+        .tag-chip-wrap {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .tag-chip-label {
+            font-size: 12px;
+            color: #395175;
+            font-weight: 700;
+        }
+
+        .command-no-results {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px dashed #c7d2e4;
+            border-radius: 8px;
+            background: #f8fbff;
+            color: #385075;
+            font-size: 13px;
+        }
+
         .cmd-block {
             margin-bottom: 6px;
             padding: 6px 8px;
             border: 1px solid #ccc;
             border-radius: 4px;
+            background: #fff;
+            transition: border-color 0.12s ease-out, box-shadow 0.12s ease-out, background-color 0.12s ease-out;
         }
 
         .cmd-block:last-child {
             margin-bottom: 0;
+        }
+
+        .cmd-block:nth-child(odd) {
+            background: #fbfdff;
+        }
+
+        .cmd-block:hover {
+            border-color: #8ea8ce;
+            box-shadow: 0 1px 4px rgba(26, 58, 105, 0.12);
+            background: #fff;
         }
 
         input {
@@ -65,7 +167,8 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            min-height: 24px;
+            min-height: 32px;
+            flex-wrap: wrap;
         }
 
         .collapse-toggle {
@@ -184,6 +287,11 @@
         @media (max-width: 760px) {
             .param-options-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .command-summary {
+                width: 100%;
+                margin-left: 0;
             }
         }
 
@@ -318,9 +426,28 @@
 
             <h2>コマンド</h2>
             <div class="section">
-                <button type="button" onclick="resetCommandSelections()">チェックをリセット</button>
+                <div class="commands-toolbar">
+                    <div class="commands-toolbar-row">
+                        <input id="commandSearch" class="command-search" type="text" placeholder="コマンドを検索" oninput="handleCommandSearchInput(this)">
+                        <button type="button" class="toolbar-button" onclick="clearCommandSearch()">検索クリア</button>
+                        <button type="button" class="toolbar-button" onclick="resetCommandSelections()">チェックをリセット</button>
+                    </div>
+                    <div class="commands-toolbar-row">
+                        <button id="filterChip_exo" type="button" class="filter-chip" onclick="toggleCommandFilter('exo')" aria-pressed="false">EXO</button>
+                        <button id="filterChip_onprem" type="button" class="filter-chip" onclick="toggleCommandFilter('onprem')" aria-pressed="false">ONPREM</button>
+                        <button id="filterChip_graph" type="button" class="filter-chip" onclick="toggleCommandFilter('graph')" aria-pressed="false">GRAPH</button>
+                    </div>
+                    <div class="commands-toolbar-row">
+                        <div class="tag-chip-wrap">
+                            <span class="tag-chip-label">Tag:</span>
+                            <div id="tagFilterChips" class="tag-chip-wrap"></div>
+                        </div>
+                        <span id="commandSummary" class="command-summary">表示 0 / 全 0</span>
+                    </div>
+                </div>
             </div>
             <div id="commands" class="section"></div>
+            <div id="commandNoResults" class="command-no-results" hidden>条件に一致するコマンドがありません。</div>
         </div>
 
         <div class="right-panel">
@@ -420,6 +547,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
         const commandDefinition = [
             {
                 commandName: "Get-Mailbox",
+                Tag: ["Mailbox"],
                 parameters: [
                     { key: "-Archive", type: "switch" },
                     { key: "-SoftDeletedMailbox", type: "switch-split" },
@@ -430,6 +558,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
             },
             {
                 commandName: "Get-MailboxStatistics",
+                Tag: ["Mailbox"],
                 parameters: [
                     { key: "-Archive", type: "switch-split" },
                     { key: "-IncludeMoveHistory", type: "switch" },
@@ -439,6 +568,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
             },
             {
                 commandName: "Get-MailboxFolderStatistics",
+                Tag: ["Mailbox"],
                 parameters: [
                     { key: "-Archive", type: "switch-split" },
                     { key: "-IncludeOldestAndNewestItems", type: "switch" },
@@ -454,6 +584,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
             },
             {
                 commandName: "Get-MailboxFolderPermission",
+                Tag: ["Mailbox", "Calendar"],
                 parameters: [
                     {
                         key: "Folder",
@@ -471,14 +602,17 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
             },
             {
                 commandName: "Get-MailboxPermission",
+                Tag: ["Mailbox"],
                 applicable: ["exo", "onprem"]
             },
             {
                 commandName: "Get-RecipientPermission",
+                Tag: ["Mailbox", "Group", "Other recipient"],
                 applicable: ["exo"]
             },
             {
                 commandName: "Get-CASMailbox",
+                Tag: ["Mailbox"],
                 parameters: [
                     { key: "-ActiveSyncDebugLogging", type: "switch" }
                 ],
@@ -486,6 +620,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
             },
             {
                 commandName: "Export-MailboxDiagnosticLogs",
+                Tag: ["Mailbox"],
                 parameters: [
                     {
                         key: "-ComponentName",
@@ -498,26 +633,32 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
             },
             {
                 commandName: "Get-User",
+                Tag: ["Mailbox", "Other recipient"],
                 applicable: ["exo", "onprem"]
             },
             {
                 commandName: "Get-Recipient",
+                Tag: ["Mailbox", "Group", "Other recipient"],
                 applicable: ["exo", "onprem"]
             },
             {
                 commandName: "Get-MailUser",
+                Tag: ["Other recipient"],
                 applicable: ["exo", "onprem"]
             },
             {
                 commandName: "Get-MailContact",
+                Tag: ["Other recipient"],
                 applicable: ["exo", "onprem"]
             },
             {
                 commandName: "Get-CalendarProcessing",
+                Tag: ["Mailbox", "Calendar"],
                 applicable: ["exo", "onprem"]
             },
             {
                 commandName: "Get-InboxRule",
+                Tag: ["Mailbox"],
                 parameters: [
                     { key: "-IncludeHidden", type: "switch" }
                 ],
@@ -525,10 +666,12 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
             },
             {
                 commandName: "Get-MailboxMessageConfiguration",
+                Tag: ["Mailbox"],
                 applicable: ["exo", "onprem"]
             },
             {
                 commandName: "Get-MailboxRegionalConfiguration",
+                Tag: ["Mailbox"],
                 parameters: [
                     { key: "-VerifyDefaultFolderNameLanguage", type: "switch" }
                 ],
@@ -536,22 +679,27 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
             },
             {
                 commandName: "Get-MailboxJunkEmailConfiguration",
+                Tag: ["Mailbox"],
                 applicable: ["exo", "onprem"]
             },
             {
                 commandName: "Get-DistributionGroup",
+                Tag: ["Group"],
                 applicable: ["exo", "onprem"]
             },
             {
                 commandName: "Get-DistributionGroupMember",
+                Tag: ["Group"],
                 applicable: ["exo", "onprem"]
             },
             {
                 commandName: "Get-UnifiedGroup",
+                Tag: ["Group"],
                 applicable: ["exo"]
             },
             {
                 commandName: "Get-UnifiedGroupLinks",
+                Tag: ["Group"],
                 parameters: [
                     {
                         key: "-LinkType",
@@ -565,10 +713,12 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
             ,
             {
                 commandName: "Get-Group",
+                Tag: ["Group"],
                 applicable: ["exo", "onprem"]
             },
             {
                 commandName: "Get-MgUser",
+                Tag: ["Mailbox", "Other recipient"],
                 parameters: [
                     {
                         key: "-Property",
@@ -582,85 +732,103 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
             },
             {
                 commandName: "Get-MgUserLicenseDetail",
+                Tag: ["Mailbox", "Other recipient"],
                 applicable: ["graph"]
             },
             {
                 commandName: "Get-RemoteMailbox",
+                Tag: ["Mailbox", "Other recipient"],
                 applicable: ["onprem"]
             },
             {
                 commandName: "Get-ADUser",
+                Tag: ["Mailbox", "Other recipient"],
                 applicable: ["onprem"]
             },
             {
                 commandName: "Get-ADGroup",
+                Tag: ["Group"],
                 applicable: ["onprem"]
             },
             {
                 commandName: "Get-ADObject",
+                Tag: ["Mailbox", "Group", "Other recipient"],
                 applicable: ["onprem"]
             },
             {
                 commandName: "Get-ADPermission",
+                Tag: ["Mailbox", "Group", "Other recipient"],
                 applicable: ["onprem"]
             },
             {
                 commandName: "Get-OrganizationConfig",
+                Tag: ["Organization"],
                 applicable: ["exo", "onprem"],
                 orgLevel: true
             },
             {
                 commandName: "Get-TransportConfig",
+                Tag: ["Organization", "Transport"],
                 applicable: ["exo", "onprem"],
                 orgLevel: true
             },
             {
                 commandName: "Get-TransportRule",
+                Tag: ["Organization", "Transport"],
                 applicable: ["exo", "onprem"],
                 orgLevel: true
             },
             {
                 commandName: "Get-InboundConnector",
+                Tag: ["Organization", "Transport"],
                 applicable: ["exo", "onprem"],
                 orgLevel: true
             },
             {
                 commandName: "Get-OutboundConnector",
+                Tag: ["Organization", "Transport"],
                 applicable: ["exo", "onprem"],
                 orgLevel: true
             },
             {
                 commandName: "Get-AcceptedDomain",
+                Tag: ["Organization", "Transport"],
                 applicable: ["exo", "onprem"],
                 orgLevel: true
             },
             {
                 commandName: "Get-RemoteDomain",
+                Tag: ["Organization", "Transport"],
                 applicable: ["exo", "onprem"],
                 orgLevel: true
             },
             {
                 commandName: "Get-OrganizationRelationship",
+                Tag: ["Organization", "Calendar"],
                 applicable: ["exo", "onprem"],
                 orgLevel: true
             },
             {
                 commandName: "Get-SharingPolicy",
+                Tag: ["Organization", "Calendar"],
                 applicable: ["exo", "onprem"],
                 orgLevel: true
             },
             {
                 commandName: "Get-IntraOrganizationConnector",
+                Tag: ["Organization", "Calendar"],
                 applicable: ["exo", "onprem"],
                 orgLevel: true
             },
             {
                 commandName: "Get-RetentionPolicy",
+                Tag: ["Organization"],
                 applicable: ["exo", "onprem"],
                 orgLevel: true
             },
             {
                 commandName: "Get-RetentionPolicyTag",
+                Tag: ["Organization"],
                 applicable: ["exo", "onprem"],
                 parameters: [
                     { key: "-IncludeSystemTags", type: "switch" }
@@ -669,25 +837,230 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
             },
             {
                 commandName: "Get-AddressBookPolicy",
+                Tag: ["Organization"],
                 applicable: ["exo", "onprem"],
                 orgLevel: true
             },
             {
                 commandName: "Get-GlobalAddressList",
+                Tag: ["Organization"],
                 applicable: ["exo", "onprem"],
                 orgLevel: true
             },
             {
                 commandName: "Get-OfflineAddressBook",
+                Tag: ["Organization"],
                 applicable: ["exo", "onprem"],
                 orgLevel: true
             },
             {
                 commandName: "Get-AddressList",
+                Tag: ["Organization"],
                 applicable: ["exo", "onprem"],
                 orgLevel: true
             }
         ];
+
+        function normalizeTagArray(tagValue) {
+            if (Array.isArray(tagValue)) {
+                return tagValue.filter(tag => !!tag).map(tag => String(tag));
+            }
+
+            if (typeof tagValue === "string" && tagValue) {
+                return [tagValue];
+            }
+
+            return [];
+        }
+
+        // Normalize Tag shape to string-array. All commands are expected to define Tag.
+        commandDefinition.forEach(cmd => {
+            const normalizedTags = normalizeTagArray(cmd.Tag);
+            cmd.Tag = normalizedTags;
+        });
+
+        // Defines display order for Tag filter chips.
+        const TAG_FILTER_ORDER = [
+            "Mailbox",
+            "Group",
+            "Other recipient",
+            "Organization",
+            "Calendar",
+            "Transport",
+        ];
+
+        const tagOrderMap = new Map(
+            TAG_FILTER_ORDER.map((tag, index) => [tag, index])
+        );
+
+        const tagCatalog = Array.from(
+            new Set(commandDefinition.flatMap(cmd => normalizeTagArray(cmd.Tag)))
+        ).sort((a, b) => {
+            const rankA = tagOrderMap.has(a) ? tagOrderMap.get(a) : Number.MAX_SAFE_INTEGER;
+            const rankB = tagOrderMap.has(b) ? tagOrderMap.get(b) : Number.MAX_SAFE_INTEGER;
+
+            if (rankA !== rankB) {
+                return rankA - rankB;
+            }
+
+            return a.localeCompare(b, "ja");
+        });
+
+        function getTagFilterKey(tag) {
+            return `tag:${String(tag).toLowerCase()}`;
+        }
+
+        const commandUiState = {
+            searchText: "",
+            filters: {
+                exo: false,
+                onprem: false,
+                graph: false,
+                orgLevel: false,
+                hasParams: false
+            },
+            collapsedGroups: {}
+        };
+
+        tagCatalog.forEach(tag => {
+            commandUiState.filters[getTagFilterKey(tag)] = false;
+        });
+
+        function renderTagFilterChips() {
+            const container = document.getElementById("tagFilterChips");
+            if (!container) {
+                return;
+            }
+
+            container.innerHTML = "";
+
+            tagCatalog.forEach(tag => {
+                const filterKey = getTagFilterKey(tag);
+                const button = document.createElement("button");
+                button.type = "button";
+                button.className = "filter-chip";
+                button.id = `filterChip_${filterKey}`;
+                button.textContent = tag;
+                button.setAttribute("aria-pressed", "false");
+                button.addEventListener("click", () => toggleCommandFilter(filterKey));
+                container.appendChild(button);
+            });
+        }
+
+        function buildCommandSearchText(commandDef) {
+            const paramKeys = (commandDef.parameters || []).map(param => param.key || "").join(" ");
+            const optionsText = (commandDef.parameters || [])
+                .flatMap(param => (param.options || []))
+                .map(option => (typeof option === "string" ? option : `${option.value || ""} ${option.label || ""}`))
+                .join(" ");
+            const applicableText = (commandDef.applicable || []).join(" ");
+
+            return `${commandDef.commandName} ${paramKeys} ${optionsText} ${applicableText}`.toLowerCase();
+        }
+
+        function handleCommandSearchInput(inputEl) {
+            commandUiState.searchText = (inputEl?.value || "").trim().toLowerCase();
+            applyCommandFilters();
+        }
+
+        function clearCommandSearch() {
+            const searchInput = document.getElementById("commandSearch");
+            if (searchInput) {
+                searchInput.value = "";
+            }
+
+            commandUiState.searchText = "";
+            applyCommandFilters();
+        }
+
+        function toggleCommandFilter(filterKey) {
+            if (!Object.prototype.hasOwnProperty.call(commandUiState.filters, filterKey)) {
+                return;
+            }
+
+            commandUiState.filters[filterKey] = !commandUiState.filters[filterKey];
+            applyCommandFilters();
+        }
+
+        function updateCommandFilterChipStates() {
+            Object.entries(commandUiState.filters).forEach(([key, active]) => {
+                const chip = document.getElementById(`filterChip_${key}`);
+                if (!chip) {
+                    return;
+                }
+
+                chip.classList.toggle("active", active);
+                chip.setAttribute("aria-pressed", String(active));
+            });
+        }
+
+        function commandMatchesActiveFilters(commandDef) {
+            const filters = commandUiState.filters;
+            const activeApplicableFilters = ["exo", "onprem", "graph"].filter(key => filters[key]);
+            const activeTagFilters = tagCatalog.filter(tag => filters[getTagFilterKey(tag)]);
+
+            if (activeApplicableFilters.length > 0) {
+                const applicable = commandDef.applicable || [];
+                const hasAnyApplicableMatch = activeApplicableFilters.some(key => applicable.includes(key));
+                if (!hasAnyApplicableMatch) {
+                    return false;
+                }
+            }
+
+            if (filters.orgLevel && !commandDef.orgLevel) {
+                return false;
+            }
+
+            if (filters.hasParams && (!Array.isArray(commandDef.parameters) || commandDef.parameters.length === 0)) {
+                return false;
+            }
+
+            if (activeTagFilters.length > 0) {
+                const commandTags = normalizeTagArray(commandDef.Tag);
+                const hasTagMatch = activeTagFilters.some(tag => commandTags.includes(tag));
+                if (!hasTagMatch) {
+                    return false;
+                }
+            }
+
+            const query = commandUiState.searchText;
+            if (!query) {
+                return true;
+            }
+
+            const searchable = buildCommandSearchText(commandDef);
+            return searchable.includes(query);
+        }
+
+        function applyCommandFilters() {
+            const totalCount = commandDefinition.length;
+            let visibleCount = 0;
+
+            commandDefinition.forEach(cmd => {
+                const block = document.querySelector(`.cmd-block[data-cmd="${cmd.commandName}"]`);
+                if (!block) {
+                    return;
+                }
+
+                const visible = commandMatchesActiveFilters(cmd);
+                block.hidden = !visible;
+                if (visible) {
+                    visibleCount += 1;
+                }
+            });
+
+            const summary = document.getElementById("commandSummary");
+            if (summary) {
+                summary.textContent = `${visibleCount} / ${totalCount}`;
+            }
+
+            const noResults = document.getElementById("commandNoResults");
+            if (noResults) {
+                noResults.hidden = visibleCount > 0;
+            }
+
+            updateCommandFilterChipStates();
+        }
 
         function generateGuidanceSteps(varDefsText, commandText) {
             const guidanceTypeValue = document.getElementById("guidanceType")?.value ?? "exo";
@@ -1032,6 +1405,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                 const isOrgLevel = !cmd.orgLevel;
                 const div = document.createElement("div");
                 div.className = "cmd-block";
+                div.setAttribute("data-cmd", commandName);
 
                 let badgeHtml = "";
                 if (cmd.applicable && Array.isArray(cmd.applicable)) {
@@ -1186,6 +1560,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
             });
 
             restoreState(state);
+            applyCommandFilters();
         }
 
         // Clears all command-related checkboxes in the command selection area.
@@ -1194,6 +1569,8 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                 input.checked = false;
                 input.indeterminate = false;
             });
+
+            updateGuidanceTypeIfNeeded();
         }
 
         // Sanitizes variable names and optionally re-renders command target checkboxes.
@@ -1842,6 +2219,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
             toggleVarNameInFileNameOptions();
             toggleExportPathInput();
             toggleGuidanceTypeOptions();
+            renderTagFilterChips();
             const keepVarNameInFileName = document.getElementById("keepVarNameInFileName");
             if (keepVarNameInFileName) {
                 keepVarNameInFileName.addEventListener("change", toggleVarNameInFileNameOptions);
@@ -1854,6 +2232,12 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
             if (guidanceTypeElement) {
                 guidanceTypeElement.addEventListener("change", toggleGuidanceTypeOptions);
             }
+
+            const commandSearchInput = document.getElementById("commandSearch");
+            if (commandSearchInput) {
+                commandSearchInput.value = commandUiState.searchText;
+            }
+
             renderCommands();
         };
 
