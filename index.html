@@ -603,6 +603,89 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
             {
                 commandName: "Get-ADPermission",
                 applicable: ["onprem"]
+            },
+            {
+                commandName: "Get-OrganizationConfig",
+                applicable: ["exo", "onprem"],
+                orgLevel: true
+            },
+            {
+                commandName: "Get-TransportConfig",
+                applicable: ["exo", "onprem"],
+                orgLevel: true
+            },
+            {
+                commandName: "Get-TransportRule",
+                applicable: ["exo", "onprem"],
+                orgLevel: true
+            },
+            {
+                commandName: "Get-InboundConnector",
+                applicable: ["exo", "onprem"],
+                orgLevel: true
+            },
+            {
+                commandName: "Get-OutboundConnector",
+                applicable: ["exo", "onprem"],
+                orgLevel: true
+            },
+            {
+                commandName: "Get-AcceptedDomain",
+                applicable: ["exo", "onprem"],
+                orgLevel: true
+            },
+            {
+                commandName: "Get-RemoteDomain",
+                applicable: ["exo", "onprem"],
+                orgLevel: true
+            },
+            {
+                commandName: "Get-OrganizationRelationship",
+                applicable: ["exo", "onprem"],
+                orgLevel: true
+            },
+            {
+                commandName: "Get-SharingPolicy",
+                applicable: ["exo", "onprem"],
+                orgLevel: true
+            },
+            {
+                commandName: "Get-IntraOrganizationConnector",
+                applicable: ["exo", "onprem"],
+                orgLevel: true
+            },
+            {
+                commandName: "Get-RetentionPolicy",
+                applicable: ["exo", "onprem"],
+                orgLevel: true
+            },
+            {
+                commandName: "Get-RetentionPolicyTag",
+                applicable: ["exo", "onprem"],
+                parameters: [
+                    { key: "-IncludeSystemTags", type: "switch" }
+                ],
+                orgLevel: true
+            },
+            {
+                commandName: "Get-AddressBookPolicy",
+                applicable: ["exo", "onprem"],
+                orgLevel: true
+            },
+            {
+                commandName: "Get-GlobalAddressList",
+                applicable: ["exo", "onprem"],
+                orgLevel: true
+            },
+            {
+                commandName: "Get-OfflineAddressBook",
+                applicable: ["exo", "onprem"],
+                orgLevel: true
+            },
+            {
+                commandName: "Get-AddressList",
+                applicable: ["exo", "onprem"],
+                orgLevel: true
             }
         ];
 
@@ -946,6 +1029,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
             commandDefinition.forEach(cmd => {
                 const commandName = cmd.commandName;
                 const hasParameters = Array.isArray(cmd.parameters) && cmd.parameters.length > 0;
+                const isOrgLevel = !cmd.orgLevel;
                 const div = document.createElement("div");
                 div.className = "cmd-block";
 
@@ -971,7 +1055,8 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                                 aria-expanded="false"
                                 onclick="toggleGroup('${commandName}', 'targets')"
                                 data-cmd="${commandName}"
-                                data-group="targets">
+                                data-group="targets"
+                                ${isOrgLevel ? "" : "disabled aria-disabled=\"true\""}>
                             <span id="chevron_targets_${commandName}" class="chevron">▶</span>
                             対象
                         </button>
@@ -1435,6 +1520,11 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                 .join("");
             const getVariantValue = key => selectedMultiCheckboxSplitParams[key] || "";
 
+            if (commandDef.orgLevel) {
+                const outputFile = `${fileNamePrefix}${premiseSuffix}${switchSplitSuffix}.xml`;
+                return `${commandName}${switchParamText}${multiCheckboxParamText} | ${EXPORT_CLIXML_ENCODING} "${outputFile}"`;
+            }
+
             if (commandDef.commandName === "Get-Mailbox") {
                 const mailboxSwitchParams = selectedAllSwitchParams.includes("-IncludeInactiveMailbox")
                     && (
@@ -1616,6 +1706,11 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
 
             const lines = [];
 
+            if (commandDef.orgLevel) {
+                lines.push(...buildCommandLinesForTarget(commandDef, "", selectedParams));
+                return lines.length > 0 ? lines.join("\n") + "\n" : "";
+            }
+
             document.querySelectorAll(`.${commandName}_target:checked`).forEach(cb => {
                 const index = parseInt(cb.value, 10);
                 const targetVarName = names[index].value.trim();
@@ -1682,6 +1777,22 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
                 "graph": "Microsoft Graph"
             };
 
+            const selectedCommands = commandDefinition.filter(cmd => {
+                const enabledCheckbox = document.querySelector(`.cmd-toggle[data-cmd="${cmd.commandName}"]`);
+                return !!(enabledCheckbox && (enabledCheckbox.checked || enabledCheckbox.indeterminate));
+            });
+
+            if (
+                (guidanceTypeValue === "exo" || guidanceTypeValue === "exoSimple")
+                && selectedCommands.some(cmd =>
+                    cmd.commandName === "Get-GlobalAddressList" || cmd.commandName === "Get-OfflineAddressBook" || cmd.commandName === "Get-AddressList"
+                )
+            ) {
+                alert("以下のコマンドは Exchange Online では Address Lists の役割が必要です。\n- Get-GlobalAddressList\n- Get-OfflineAddressBook\n- Get-AddressList");
+            }
+
+            const shouldIncludeVarDefsText = !(selectedCommands.length > 0 && selectedCommands.every(cmd => !!cmd.orgLevel));
+
             for (const cmd of commandDefinition) {
                 const commandName = cmd.commandName;
                 const enabledCheckbox = document.querySelector(`.cmd-toggle[data-cmd="${commandName}"]`);
@@ -1708,9 +1819,11 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
 
             const includeGuidanceText = document.getElementById("includeGuidanceText");
             if (includeGuidanceText && includeGuidanceText.checked) {
-                commandsText = generateGuidanceSteps(varDefsText, commandsText);
+                commandsText = generateGuidanceSteps(shouldIncludeVarDefsText ? varDefsText : "", commandsText);
             } else {
-                commandsText = varDefsText + "\n" + commandsText;
+                commandsText = shouldIncludeVarDefsText
+                    ? varDefsText + "\n" + commandsText
+                    : commandsText;
             }
 
             document.getElementById("output").value = commandsText;
