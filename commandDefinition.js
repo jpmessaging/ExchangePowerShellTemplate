@@ -147,6 +147,16 @@ window.commandDefinition = [
         applicable: ["exo", "onprem"]
     },
     {
+        commandName: "Get-DynamicDistributionGroup",
+        tag: ["Group"],
+        applicable: ["exo", "onprem"]
+    },
+    {
+        commandName: "Get-DynamicDistributionGroupMember",
+        tag: ["Group"],
+        applicable: ["exo", "onprem"]
+    },
+    {
         commandName: "Get-UnifiedGroup",
         tag: ["Group"],
         applicable: ["exo"]
