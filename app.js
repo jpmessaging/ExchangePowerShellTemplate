@@ -342,21 +342,21 @@ function sanitizeVarName(raw) {
 
 // Updates a command-level checkbox state based on its target checkbox states.
 function updateParentCheckbox(commandName) {
-    const parent = document.querySelector(`.cmd-toggle[data-cmd="${commandName}"]`);
+    const cmdToggle = document.querySelector(`.cmd-toggle[data-cmd="${commandName}"]`);
     const children = document.querySelectorAll(`.${commandName}_target`);
 
     const total = children.length;
     const checked = Array.from(children).filter(cb => cb.checked).length;
 
     if (checked === 0) {
-        parent.checked = false;
-        parent.indeterminate = false;
+        cmdToggle.checked = false;
+        cmdToggle.indeterminate = false;
     } else if (checked === total) {
-        parent.checked = true;
-        parent.indeterminate = false;
+        cmdToggle.checked = true;
+        cmdToggle.indeterminate = false;
     } else {
-        parent.checked = false;
-        parent.indeterminate = true;
+        cmdToggle.checked = false;
+        cmdToggle.indeterminate = true;
     }
 }
 
@@ -382,8 +382,8 @@ function toggleAllTargetsForCommand(commandName, parentCheckbox) {
 // Checks if all checked commands support common guidance types and updates accordingly with priority: exo > onprem > graph.
 function updateGuidanceTypeIfNeeded() {
     const checkedCommands = commandDefinition.filter(cmd => {
-        const toggle = document.querySelector(`.cmd-toggle[data-cmd="${cmd.commandName}"]`);
-        return toggle && (toggle.checked || toggle.indeterminate);
+        const cmdToggle = document.querySelector(`.cmd-toggle[data-cmd="${cmd.commandName}"]`);
+        return cmdToggle && (cmdToggle.checked || cmdToggle.indeterminate);
     });
 
     if (checkedCommands.length === 0) {
@@ -470,12 +470,12 @@ function saveState() {
 
     commandDefinition.forEach(cmd => {
         const commandName = cmd.commandName;
-        const toggle = document.querySelector(`.cmd-toggle[data-cmd="${commandName}"]`);
+        const cmdToggle = document.querySelector(`.cmd-toggle[data-cmd="${commandName}"]`);
         const targetsCollapse = document.querySelector(`.collapse-toggle[data-cmd="${commandName}"][data-group="targets"]`);
         const paramsCollapse = document.querySelector(`.collapse-toggle[data-cmd="${commandName}"][data-group="params"]`);
 
         state[commandName] = {
-            enabled: !!(toggle && toggle.checked),
+            enabled: !!(cmdToggle && cmdToggle.checked),
             targets: [],
             params: [],
             parameterValues: {},
@@ -519,9 +519,9 @@ function restoreState(state) {
     commandDefinition.forEach(cmd => {
         const commandName = cmd.commandName;
 
-        const toggle = document.querySelector(`.cmd-toggle[data-cmd="${commandName}"]`);
-        if (toggle) {
-            toggle.checked = !!state[commandName].enabled;
+        const cmdToggle = document.querySelector(`.cmd-toggle[data-cmd="${commandName}"]`);
+        if (cmdToggle) {
+            cmdToggle.checked = !!state[commandName].enabled;
         }
 
         document.querySelectorAll(`.${commandName}_target`).forEach(cb => {
@@ -560,7 +560,7 @@ function renderCommands() {
     const state = saveState();
     const container = document.getElementById("commands");
     container.innerHTML = "";
-    const targetVarNames = document.querySelectorAll(".target-var-name");
+    const targetNameInputs = document.querySelectorAll(".target-var-name");
 
     commandDefinition.forEach(cmd => {
         const commandName = cmd.commandName;
@@ -613,7 +613,7 @@ function renderCommands() {
             <div id="targetGroup_${commandName}" class="target-group">
         `;
 
-        targetVarNames.forEach((input, i) => {
+        targetNameInputs.forEach((input, i) => {
             const name = input.value.trim();
 
             if (name) {
@@ -738,9 +738,9 @@ function resetCommandSelections() {
 
 // Sanitizes variable names and optionally re-renders command target checkboxes.
 function handleVarNameInput(inputEl = null, shouldRender = inputEl !== null) {
-    const targets = inputEl ? [inputEl] : Array.from(document.querySelectorAll(".target-var-name"));
+    const targetNameInputs = inputEl ? [inputEl] : Array.from(document.querySelectorAll(".target-var-name"));
 
-    targets.forEach(input => {
+    targetNameInputs.forEach(input => {
         const sanitized = sanitizeVarName(input.value);
         if (input.value !== sanitized) {
             input.value = sanitized;
@@ -857,10 +857,10 @@ function toggleGuidanceTypeOptions() {
 
 // Adds a new target row with default variable name and mailbox value.
 function addTarget() {
-    const table = document.querySelector("#targetTable tbody");
-    const index = table.rows.length + 1;
+    const targetTableBody = document.querySelector("#targetTable tbody");
+    const index = targetTableBody.rows.length + 1;
 
-    const row = table.insertRow();
+    const row = targetTableBody.insertRow();
 
     row.innerHTML = `
         <td><input class="target-var-name" value="User${index}" onchange="handleVarNameInput(this)"></td>
@@ -873,9 +873,9 @@ function addTarget() {
 
 // Removes a target row while ensuring at least one target remains.
 function removeTarget(buttonEl) {
-    const tableBody = document.querySelector("#targetTable tbody");
+    const targetTableBody = document.querySelector("#targetTable tbody");
 
-    if (tableBody.rows.length <= 1) {
+    if (targetTableBody.rows.length <= 1) {
         alert("少なくとも 1 ユーザーは必要です。");
         return;
     }
@@ -1004,14 +1004,8 @@ function collectSelectedParams(commandDef) {
             continue;
         }
 
-        const isMandatory = param.isMandatory !== false;
         const selectedValues = Array.from(document.querySelectorAll(`.${commandName}_value_${param.key}:checked`))
             .map(cb => cb.value);
-
-        if (isMandatory && selectedValues.length === 0) {
-            alert(`${commandDef.commandName} は ${param.key} の選択が必須です。`);
-            return null;
-        }
 
         if (selectedValues.length > 0) {
             if (param.type === "multi-checkbox") {
@@ -1230,30 +1224,30 @@ function buildCommandLinesForTarget(commandDef, targetVarName, selectedParams) {
 }
 
 // Generates the output chunk for one command across all selected targets.
-function buildCommandOutputChunk(commandDef, names) {
-    const commandName = commandDef.commandName;
-    const enabled = document.querySelector(`.cmd-toggle[data-cmd="${commandName}"]`);
+function buildCommandOutputChunk(selectedCommand, targetVarNames) {
+    const commandName = selectedCommand.commandName;
+    const cmdToggle = document.querySelector(`.cmd-toggle[data-cmd="${commandName}"]`);
 
-    if (!enabled || (!enabled.checked && !enabled.indeterminate)) {
+    if (!cmdToggle || (!cmdToggle.checked && !cmdToggle.indeterminate)) {
         return "";
     }
 
-    const selectedParams = collectSelectedParams(commandDef);
+    const selectedParams = collectSelectedParams(selectedCommand);
     if (!selectedParams) {
         return null;
     }
 
     const lines = [];
 
-    if (commandDef.orgLevel) {
-        lines.push(...buildCommandLinesForTarget(commandDef, "", selectedParams));
+    if (selectedCommand.orgLevel) {
+        lines.push(...buildCommandLinesForTarget(selectedCommand, "", selectedParams));
         return lines.length > 0 ? lines.join("\n") + "\n" : "";
     }
 
     document.querySelectorAll(`.${commandName}_target:checked`).forEach(cb => {
         const index = parseInt(cb.value, 10);
-        const targetVarName = names[index].value.trim();
-        lines.push(...buildCommandLinesForTarget(commandDef, targetVarName, selectedParams));
+        const targetVarName = targetVarNames[index].value.trim();
+        lines.push(...buildCommandLinesForTarget(selectedCommand, targetVarName, selectedParams));
     });
 
     if (lines.length === 0) {
@@ -1263,92 +1257,142 @@ function buildCommandOutputChunk(commandDef, names) {
     return lines.join("\n") + "\n";
 }
 
+// Validates inputs before generation and returns normalized context for output creation.
+function validateGenerateInputs() {
+    const psVarNamePattern = /^[A-Za-z_][A-Za-z0-9_]*$/;
+    let varDefsText = "";
+    const targetNameInputs = document.querySelectorAll(".target-var-name");
+    const targetValueInputs = document.querySelectorAll(".target-var-value");
+
+    for (const [index, targetNameInputEl] of targetNameInputs.entries()) {
+        const targetValueInputEl = targetValueInputs[index];
+        const targetNameText = targetNameInputEl.value.trim();
+        const targetValueText = targetValueInputEl.value.trim();
+
+        if (!targetValueText) {
+            alert("値 (メール アドレス) が未入力です。");
+            targetValueInputEl.focus();
+            return null;
+        }
+
+        if (targetNameText && !psVarNamePattern.test(targetNameText)) {
+            alert(`無効な変数名です: ${targetNameText}`);
+            targetNameInputEl.focus();
+            return null;
+        }
+
+        if (targetNameText && targetValueText) {
+            varDefsText += `$${targetNameText} = "${targetValueText}"\n`;
+        }
+    }
+
+    const selectedCommands = commandDefinition.filter(cmd => {
+        const cmdToggle = document.querySelector(`.cmd-toggle[data-cmd="${cmd.commandName}"]`);
+        return !!(cmdToggle && (cmdToggle.checked || cmdToggle.indeterminate));
+    });
+
+    for (const selectedCommand of selectedCommands) {
+        for (const selectedParameter of (selectedCommand.parameters || [])) {
+            if (selectedParameter.type !== "multi-checkbox" && selectedParameter.type !== "multi-checkbox-split") {
+                continue;
+            }
+
+            if (selectedParameter.isMandatory === false) {
+                continue;
+            }
+
+            const selectedValues = Array.from(
+                document.querySelectorAll(`.${selectedCommand.commandName}_value_${selectedParameter.key}:checked`)
+            );
+            if (selectedValues.length > 0) {
+                continue;
+            }
+
+            alert(`${selectedCommand.commandName} は ${selectedParameter.key} の選択が必須です。`);
+            const firstOption = document.querySelector(`.${selectedCommand.commandName}_value_${selectedParameter.key}`);
+            if (firstOption) {
+                firstOption.focus();
+            }
+            return null;
+        }
+    }
+
+    const warningMessages = [];
+    const isKeepVarNameInFileNameEnabled = document.getElementById("keepVarNameInFileName")?.checked ?? false;
+    if (targetNameInputs.length > 1 && !isKeepVarNameInFileNameEnabled) {
+        warningMessages.push("複数の変数が定義されています。\n[ファイル名に変数を含める] が無効の場合、ファイル名が重複する可能性があります。");
+    }
+
+    const guidanceTypeValue = document.getElementById("guidanceType")?.value ?? "exo";
+    const applicableGuidanceType = guidanceTypeValue === "exoSimple"
+        ? "exo"
+        : guidanceTypeValue === "onpremSimple"
+            ? "onprem"
+            : guidanceTypeValue;
+    const guidanceTypeMap = {
+        exo: "Exchange Online",
+        exoSimple: "Exchange Online",
+        onprem: "オンプレミス",
+        onpremSimple: "オンプレミス",
+        graph: "Microsoft Graph"
+    };
+
+    const includesExoAddressListCmd =
+        (guidanceTypeValue === "exo" || guidanceTypeValue === "exoSimple")
+        && selectedCommands.some(cmd =>
+            cmd.commandName === "Get-GlobalAddressList"
+            || cmd.commandName === "Get-OfflineAddressBook"
+            || cmd.commandName === "Get-AddressList"
+        );
+
+    if (includesExoAddressListCmd) {
+        warningMessages.push("以下のコマンドは Exchange Online では Address Lists の役割が必要です。\n- Get-GlobalAddressList\n- Get-OfflineAddressBook\n- Get-AddressList");
+    }
+
+    const unavailableCommands = selectedCommands
+        .filter(cmd => cmd.applicable && !cmd.applicable.includes(applicableGuidanceType))
+        .map(cmd => cmd.commandName);
+
+    if (unavailableCommands.length > 0) {
+        warningMessages.push(
+            `${guidanceTypeMap[guidanceTypeValue]} で利用不可のコマンドがあります。\n- ${unavailableCommands.join("\n- ")}`
+        );
+    }
+
+    for (const warningMessage of warningMessages) {
+        alert(warningMessage);
+    }
+
+    const shouldIncludeVarDefsText = !(selectedCommands.length > 0 && selectedCommands.every(cmd => !!cmd.orgLevel));
+    const includeGuidanceTextEnabled = !!document.getElementById("includeGuidanceText")?.checked;
+
+    return {
+        targetVarNames: targetNameInputs,
+        varDefsText,
+        shouldIncludeVarDefsText,
+        selectedCommands,
+        includeGuidanceTextEnabled
+    };
+}
+
 // Validates inputs and composes the final PowerShell script output.
 function generate() {
     handleVarNameInput(null, false);
     updateAllParentCheckboxes();
-    let varDefsText = "";
     let commandsText = "";
 
-    const targetVarNames = document.querySelectorAll(".target-var-name");
-    const targetVarValues = document.querySelectorAll(".target-var-value");
-    const psVarNamePattern = /^[A-Za-z_][A-Za-z0-9_]*$/;
-
-    for (let i = 0; i < targetVarNames.length; i++) {
-        const varName = targetVarNames[i].value.trim();
-        const value = targetVarValues[i].value.trim();
-
-        if (!value) {
-            alert(`値 (メール アドレス) が未入力です: ${i + 1} 行目`);
-            targetVarValues[i].focus();
-            return;
-        }
-
-        if (varName && !psVarNamePattern.test(varName)) {
-            alert(`無効な変数名です: ${varName}`);
-            targetVarNames[i].focus();
-            return;
-        }
-
-        if (varName && value) {
-            varDefsText += `$${varName} = "${value}"\n`;
-        }
+    const validationResult = validateGenerateInputs();
+    if (!validationResult) {
+        return;
     }
 
-    const isKeepVarNameInFileNameEnabled = document.getElementById("keepVarNameInFileName")?.checked ?? false;
-    if (targetVarNames.length > 1 && !isKeepVarNameInFileNameEnabled) {
-        alert("複数の変数が定義されています。\n[ファイル名に変数を含める] が無効の場合、ファイル名が重複する可能性があります。");
-    }
+    const targetVarNames = validationResult.targetVarNames;
+    const varDefsText = validationResult.varDefsText;
+    const shouldIncludeVarDefsText = validationResult.shouldIncludeVarDefsText;
+    const includeGuidanceTextEnabled = validationResult.includeGuidanceTextEnabled;
 
-    // Check if selected commands are applicable to the selected guidance type
-    const guidanceTypeValue = document.getElementById("guidanceType") ? document.getElementById("guidanceType").value : "exo";
-    
-    // Treat exoSimple/onpremSimple as exo/onprem respectively
-    const applicableGuidanceType = guidanceTypeValue === "exoSimple" ? "exo"
-                                 : guidanceTypeValue === "onpremSimple" ? "onprem"
-                                 : guidanceTypeValue;
-
-    const guidanceTypeMap = {
-        "exo": "Exchange Online",
-        "exoSimple": "Exchange Online",
-        "onprem": "オンプレミス",
-        "onpremSimple": "オンプレミス",
-        "graph": "Microsoft Graph"
-    };
-
-    const selectedCommands = commandDefinition.filter(cmd => {
-        const enabledCheckbox = document.querySelector(`.cmd-toggle[data-cmd="${cmd.commandName}"]`);
-        return !!(enabledCheckbox && (enabledCheckbox.checked || enabledCheckbox.indeterminate));
-    });
-
-    if (
-        (guidanceTypeValue === "exo" || guidanceTypeValue === "exoSimple")
-        && selectedCommands.some(cmd =>
-            cmd.commandName === "Get-GlobalAddressList" || cmd.commandName === "Get-OfflineAddressBook" || cmd.commandName === "Get-AddressList"
-        )
-    ) {
-        alert("以下のコマンドは Exchange Online では Address Lists の役割が必要です。\n- Get-GlobalAddressList\n- Get-OfflineAddressBook\n- Get-AddressList");
-    }
-
-    const shouldIncludeVarDefsText = !(selectedCommands.length > 0 && selectedCommands.every(cmd => !!cmd.orgLevel));
-
-    for (const cmd of commandDefinition) {
-        const commandName = cmd.commandName;
-        const enabledCheckbox = document.querySelector(`.cmd-toggle[data-cmd="${commandName}"]`);
-        
-        // Check if the command is selected
-        if (!enabledCheckbox || (!enabledCheckbox.checked && !enabledCheckbox.indeterminate)) {
-            continue;
-        }
-        
-        // If applicable property exists, check if the guidance type is included
-        if (cmd.applicable && !cmd.applicable.includes(applicableGuidanceType)) {
-            alert(`${commandName} は ${guidanceTypeMap[guidanceTypeValue]} で利用不可です。`);
-        }
-    }
-
-    for (const cmd of commandDefinition) {
-        const chunk = buildCommandOutputChunk(cmd, targetVarNames);
+    for (const selectedCommand of validationResult.selectedCommands) {
+        const chunk = buildCommandOutputChunk(selectedCommand, targetVarNames);
         if (chunk === null) {
             return;
         }
@@ -1356,8 +1400,7 @@ function generate() {
         commandsText += chunk;
     }
 
-    const includeGuidanceText = document.getElementById("includeGuidanceText");
-    if (includeGuidanceText && includeGuidanceText.checked) {
+    if (includeGuidanceTextEnabled) {
         commandsText = generateGuidanceSteps(shouldIncludeVarDefsText ? varDefsText : "", commandsText);
     } else {
         commandsText = shouldIncludeVarDefsText
@@ -1365,7 +1408,10 @@ function generate() {
             : commandsText;
     }
 
-    document.getElementById("output").value = commandsText;
+    const output = document.getElementById("output");
+    if (output) {
+        output.value = commandsText;
+    }
 }
 
 // Copies the generated script text to the clipboard.
