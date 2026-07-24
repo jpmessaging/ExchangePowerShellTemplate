@@ -98,7 +98,7 @@ const commandDefinition = [
     },
     {
         commandName: "Export-MailboxDiagnosticLogs",
-        Tag: ["Mailbox"],
+        Tag: ["Mailbox", "Calendar"],
         parameters: [
             {
                 key: "-ComponentName",
