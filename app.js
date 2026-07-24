@@ -25,7 +25,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
 const commandDefinition = [
     {
         commandName: "Get-Mailbox",
-        Tag: ["Mailbox"],
+        tag: ["Mailbox"],
         parameters: [
             { key: "-Archive", type: "switch" },
             { key: "-SoftDeletedMailbox", type: "switch-split" },
@@ -36,7 +36,7 @@ const commandDefinition = [
     },
     {
         commandName: "Get-MailboxStatistics",
-        Tag: ["Mailbox"],
+        tag: ["Mailbox"],
         parameters: [
             { key: "-Archive", type: "switch-split" },
             { key: "-IncludeMoveHistory", type: "switch" },
@@ -46,7 +46,7 @@ const commandDefinition = [
     },
     {
         commandName: "Get-MailboxFolderStatistics",
-        Tag: ["Mailbox"],
+        tag: ["Mailbox"],
         parameters: [
             { key: "-Archive", type: "switch-split" },
             { key: "-IncludeOldestAndNewestItems", type: "switch" },
@@ -62,7 +62,7 @@ const commandDefinition = [
     },
     {
         commandName: "Get-MailboxFolderPermission",
-        Tag: ["Mailbox", "Calendar"],
+        tag: ["Mailbox", "Calendar"],
         parameters: [
             {
                 key: "Folder",
@@ -80,17 +80,17 @@ const commandDefinition = [
     },
     {
         commandName: "Get-MailboxPermission",
-        Tag: ["Mailbox"],
+        tag: ["Mailbox"],
         applicable: ["exo", "onprem"]
     },
     {
         commandName: "Get-RecipientPermission",
-        Tag: ["Mailbox", "Group", "Other recipient"],
+        tag: ["Mailbox", "Group", "Other recipient"],
         applicable: ["exo"]
     },
     {
         commandName: "Get-CASMailbox",
-        Tag: ["Mailbox"],
+        tag: ["Mailbox"],
         parameters: [
             { key: "-ActiveSyncDebugLogging", type: "switch" }
         ],
@@ -98,7 +98,7 @@ const commandDefinition = [
     },
     {
         commandName: "Export-MailboxDiagnosticLogs",
-        Tag: ["Mailbox", "Calendar"],
+        tag: ["Mailbox", "Calendar"],
         parameters: [
             {
                 key: "-ComponentName",
@@ -111,32 +111,32 @@ const commandDefinition = [
     },
     {
         commandName: "Get-User",
-        Tag: ["Mailbox", "Other recipient"],
+        tag: ["Mailbox", "Other recipient"],
         applicable: ["exo", "onprem"]
     },
     {
         commandName: "Get-Recipient",
-        Tag: ["Mailbox", "Group", "Other recipient"],
+        tag: ["Mailbox", "Group", "Other recipient"],
         applicable: ["exo", "onprem"]
     },
     {
         commandName: "Get-MailUser",
-        Tag: ["Other recipient"],
+        tag: ["Other recipient"],
         applicable: ["exo", "onprem"]
     },
     {
         commandName: "Get-MailContact",
-        Tag: ["Other recipient"],
+        tag: ["Other recipient"],
         applicable: ["exo", "onprem"]
     },
     {
         commandName: "Get-CalendarProcessing",
-        Tag: ["Mailbox", "Calendar"],
+        tag: ["Mailbox", "Calendar"],
         applicable: ["exo", "onprem"]
     },
     {
         commandName: "Get-InboxRule",
-        Tag: ["Mailbox"],
+        tag: ["Mailbox"],
         parameters: [
             { key: "-IncludeHidden", type: "switch" }
         ],
@@ -144,12 +144,12 @@ const commandDefinition = [
     },
     {
         commandName: "Get-MailboxMessageConfiguration",
-        Tag: ["Mailbox"],
+        tag: ["Mailbox"],
         applicable: ["exo", "onprem"]
     },
     {
         commandName: "Get-MailboxRegionalConfiguration",
-        Tag: ["Mailbox"],
+        tag: ["Mailbox"],
         parameters: [
             { key: "-VerifyDefaultFolderNameLanguage", type: "switch" }
         ],
@@ -157,27 +157,27 @@ const commandDefinition = [
     },
     {
         commandName: "Get-MailboxJunkEmailConfiguration",
-        Tag: ["Mailbox"],
+        tag: ["Mailbox"],
         applicable: ["exo", "onprem"]
     },
     {
         commandName: "Get-DistributionGroup",
-        Tag: ["Group"],
+        tag: ["Group"],
         applicable: ["exo", "onprem"]
     },
     {
         commandName: "Get-DistributionGroupMember",
-        Tag: ["Group"],
+        tag: ["Group"],
         applicable: ["exo", "onprem"]
     },
     {
         commandName: "Get-UnifiedGroup",
-        Tag: ["Group"],
+        tag: ["Group"],
         applicable: ["exo"]
     },
     {
         commandName: "Get-UnifiedGroupLinks",
-        Tag: ["Group"],
+        tag: ["Group"],
         parameters: [
             {
                 key: "-LinkType",
@@ -191,12 +191,12 @@ const commandDefinition = [
     ,
     {
         commandName: "Get-Group",
-        Tag: ["Group"],
+        tag: ["Group"],
         applicable: ["exo", "onprem"]
     },
     {
         commandName: "Get-MgUser",
-        Tag: ["Mailbox", "Other recipient"],
+        tag: ["Mailbox", "Other recipient"],
         parameters: [
             {
                 key: "-Property",
@@ -210,103 +210,103 @@ const commandDefinition = [
     },
     {
         commandName: "Get-MgUserLicenseDetail",
-        Tag: ["Mailbox", "Other recipient"],
+        tag: ["Mailbox", "Other recipient"],
         applicable: ["graph"]
     },
     {
         commandName: "Get-RemoteMailbox",
-        Tag: ["Mailbox", "Other recipient"],
+        tag: ["Mailbox", "Other recipient"],
         applicable: ["onprem"]
     },
     {
         commandName: "Get-ADUser",
-        Tag: ["Mailbox", "Other recipient"],
+        tag: ["Mailbox", "Other recipient"],
         applicable: ["onprem"]
     },
     {
         commandName: "Get-ADGroup",
-        Tag: ["Group"],
+        tag: ["Group"],
         applicable: ["onprem"]
     },
     {
         commandName: "Get-ADObject",
-        Tag: ["Mailbox", "Group", "Other recipient"],
+        tag: ["Mailbox", "Group", "Other recipient"],
         applicable: ["onprem"]
     },
     {
         commandName: "Get-ADPermission",
-        Tag: ["Mailbox", "Group", "Other recipient"],
+        tag: ["Mailbox", "Group", "Other recipient"],
         applicable: ["onprem"]
     },
     {
         commandName: "Get-OrganizationConfig",
-        Tag: ["Organization"],
+        tag: ["Organization"],
         applicable: ["exo", "onprem"],
         orgLevel: true
     },
     {
         commandName: "Get-TransportConfig",
-        Tag: ["Organization", "Transport"],
+        tag: ["Organization", "Transport"],
         applicable: ["exo", "onprem"],
         orgLevel: true
     },
     {
         commandName: "Get-TransportRule",
-        Tag: ["Organization", "Transport"],
+        tag: ["Organization", "Transport"],
         applicable: ["exo", "onprem"],
         orgLevel: true
     },
     {
         commandName: "Get-InboundConnector",
-        Tag: ["Organization", "Transport"],
+        tag: ["Organization", "Transport"],
         applicable: ["exo", "onprem"],
         orgLevel: true
     },
     {
         commandName: "Get-OutboundConnector",
-        Tag: ["Organization", "Transport"],
+        tag: ["Organization", "Transport"],
         applicable: ["exo", "onprem"],
         orgLevel: true
     },
     {
         commandName: "Get-AcceptedDomain",
-        Tag: ["Organization", "Transport"],
+        tag: ["Organization", "Transport"],
         applicable: ["exo", "onprem"],
         orgLevel: true
     },
     {
         commandName: "Get-RemoteDomain",
-        Tag: ["Organization", "Transport"],
+        tag: ["Organization", "Transport"],
         applicable: ["exo", "onprem"],
         orgLevel: true
     },
     {
         commandName: "Get-OrganizationRelationship",
-        Tag: ["Organization", "Calendar"],
+        tag: ["Organization", "Calendar"],
         applicable: ["exo", "onprem"],
         orgLevel: true
     },
     {
         commandName: "Get-SharingPolicy",
-        Tag: ["Organization", "Calendar"],
+        tag: ["Organization", "Calendar"],
         applicable: ["exo", "onprem"],
         orgLevel: true
     },
     {
         commandName: "Get-IntraOrganizationConnector",
-        Tag: ["Organization", "Calendar"],
+        tag: ["Organization", "Calendar"],
         applicable: ["exo", "onprem"],
         orgLevel: true
     },
     {
         commandName: "Get-RetentionPolicy",
-        Tag: ["Organization"],
+        tag: ["Organization"],
         applicable: ["exo", "onprem"],
         orgLevel: true
     },
     {
         commandName: "Get-RetentionPolicyTag",
-        Tag: ["Organization"],
+        tag: ["Organization"],
         applicable: ["exo", "onprem"],
         parameters: [
             { key: "-IncludeSystemTags", type: "switch" }
@@ -315,25 +315,25 @@ const commandDefinition = [
     },
     {
         commandName: "Get-AddressBookPolicy",
-        Tag: ["Organization"],
+        tag: ["Organization"],
         applicable: ["exo", "onprem"],
         orgLevel: true
     },
     {
         commandName: "Get-GlobalAddressList",
-        Tag: ["Organization"],
+        tag: ["Organization"],
         applicable: ["exo", "onprem"],
         orgLevel: true
     },
     {
         commandName: "Get-OfflineAddressBook",
-        Tag: ["Organization"],
+        tag: ["Organization"],
         applicable: ["exo", "onprem"],
         orgLevel: true
     },
     {
         commandName: "Get-AddressList",
-        Tag: ["Organization"],
+        tag: ["Organization"],
         applicable: ["exo", "onprem"],
         orgLevel: true
     }
@@ -351,10 +351,10 @@ function normalizeTagArray(tagValue) {
     return [];
 }
 
-// Normalize Tag shape to string-array. All commands are expected to define Tag.
+// Normalize tag shape to string-array. All commands are expected to define tag.
 commandDefinition.forEach(cmd => {
-    const normalizedTags = normalizeTagArray(cmd.Tag);
-    cmd.Tag = normalizedTags;
+    const normalizedTags = normalizeTagArray(cmd.tag);
+    cmd.tag = normalizedTags;
 });
 
 // Defines display order for Tag filter chips.
@@ -372,7 +372,7 @@ const tagOrderMap = new Map(
 );
 
 const tagCatalog = Array.from(
-    new Set(commandDefinition.flatMap(cmd => normalizeTagArray(cmd.Tag)))
+    new Set(commandDefinition.flatMap(cmd => normalizeTagArray(cmd.tag)))
 ).sort((a, b) => {
     const rankA = tagOrderMap.has(a) ? tagOrderMap.get(a) : Number.MAX_SAFE_INTEGER;
     const rankB = tagOrderMap.has(b) ? tagOrderMap.get(b) : Number.MAX_SAFE_INTEGER;
@@ -494,7 +494,7 @@ function commandMatchesActiveFilters(commandDef) {
     }
 
     if (activeTagFilters.length > 0) {
-        const commandTags = normalizeTagArray(commandDef.Tag);
+        const commandTags = normalizeTagArray(commandDef.tag);
         const hasTagMatch = activeTagFilters.some(tag => commandTags.includes(tag));
         if (!hasTagMatch) {
             return false;
@@ -1717,4 +1717,5 @@ window.onload = function () {
 
     renderCommands();
 };
+
 
