@@ -1448,6 +1448,3 @@ window.onload = function () {
 
     renderCommands();
 };
-
-
-
