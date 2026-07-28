@@ -1511,6 +1511,7 @@ function collectAllSettings() {
 function saveSettingsToStorage(name) {
     const presets = getAllPresets();
     presets[name] = collectAllSettings();
+    presets[name].name = name;
     localStorage.setItem("exchangeTemplatePresets", JSON.stringify(presets));
     updatePresetSelect();
 }
@@ -1627,6 +1628,24 @@ function loadPreset() {
     loadSettingsFromStorage(name);
 }
 
+// Sets the current settings as the default preset.
+function setDefault() {
+    const select = document.getElementById("presetSelect");
+    const name = select ? select.value : "";
+    if (!name) {
+        alert("読み込む設定を選択してください。");
+        return;
+    }
+    const presets = getAllPresets();
+    const settings = presets[name];
+    if (!settings) return;
+    Object.keys(presets).forEach(key => {
+        presets[key].isDefault = key === name;
+    });
+    localStorage.setItem("exchangeTemplatePresets", JSON.stringify(presets));
+    alert(`"${name}" をデフォルト設定にしました。`);
+}
+
 // Deletes the preset selected in the dropdown.
 function deleteSelectedPreset() {
     const select = document.getElementById("presetSelect");
@@ -1668,5 +1687,14 @@ window.onload = function () {
     }
 
     updatePresetSelect();
-    renderCommands();
+
+    const defaultPresetEntry = Object.entries(getAllPresets()).find(([, preset]) => preset.isDefault);
+    if (defaultPresetEntry) {
+        const [defaultName, defaultSettings] = defaultPresetEntry;
+        applySettings(defaultSettings, defaultName);
+        const select = document.getElementById("presetSelect");
+        if (select) select.value = defaultName;
+    } else {
+        renderCommands();
+    }
 };
