@@ -533,6 +533,8 @@ function saveState() {
                         ? param.defaultSelectedOptions
                         : [];
 
+                    // Use checked values if any; fall back to defaultSelectedOptions when the UI
+                    // has not yet rendered (e.g. on initial load); otherwise store an empty array.
                     state[commandName].parameterValues[param.key] =
                         selectedValues.length > 0
                             ? selectedValues
@@ -1071,6 +1073,8 @@ function buildCommandLine(commandDef, targetVarName, selectedParamsByType) {
     const fileNamePrefix = getfileNamePrefixFromCommand(commandDef.commandName);
     const bracedTargetVarName = "${" + targetVarName + "}";
     const switchSplitSuffix = selectedSwitchSplitParams.length > 0 ? `_${selectedSwitchSplitParams.map(param => param.replace(/^-+/, "")).join("_")}` : "";
+    // When expandVarNameInFileName is true, use the braced form (e.g. ${User1}) so PowerShell
+    // expands the variable at runtime. When false, embed the literal name (e.g. User1) instead.
     const varNameInFileName = !keepVarNameInFileName
         ? ""
         : (expandVarNameInFileName
@@ -1092,6 +1096,8 @@ function buildCommandLine(commandDef, targetVarName, selectedParamsByType) {
     }
 
     if (commandDef.commandName === "Get-Mailbox") {
+        // Drop -IncludeInactiveMailbox when -SoftDeletedMailbox or -InactiveMailboxOnly is present,
+        // because those parameters already imply inactive mailbox inclusion in Exchange Online.
         const mailboxSwitchParams = selectedAllSwitchParams.includes("-IncludeInactiveMailbox")
             && (
                 selectedAllSwitchParams.includes("-SoftDeletedMailbox")
@@ -1100,6 +1106,7 @@ function buildCommandLine(commandDef, targetVarName, selectedParamsByType) {
             ? selectedAllSwitchParams.filter(param => param !== "-IncludeInactiveMailbox")
             : selectedAllSwitchParams;
 
+        // -SoftDeletedMailbox and -InactiveMailboxOnly cannot be combined; skip this variant.
         if (mailboxSwitchParams.includes("-SoftDeletedMailbox") && mailboxSwitchParams.includes("-InactiveMailboxOnly")) {
             return "";
         }
@@ -1157,6 +1164,8 @@ function buildCommandLine(commandDef, targetVarName, selectedParamsByType) {
                 return input ? input.value.trim() : "";
             })
             .filter(name => !!name);
+        // Notes about localized folder names are appended only to the last generated command line
+        // (last target × last folder), so they appear once at the end instead of repeating.
         const isLastTarget = selectedTargetVarNames.length === 0
             ? true
             : targetVarName === selectedTargetVarNames[selectedTargetVarNames.length - 1];
