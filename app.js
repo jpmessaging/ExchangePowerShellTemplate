@@ -1504,6 +1504,195 @@ function copy() {
     document.execCommand("copy");
 }
 
+// Returns all saved presets from localStorage.
+function getAllPresets() {
+    try {
+        return JSON.parse(localStorage.getItem("exchangeTemplatePresets") || "{}");
+    } catch {
+        return {};
+    }
+}
+
+// Collects current UI state into a plain object for serialization.
+function collectAllSettings() {
+    const targets = [];
+    document.querySelectorAll("#targetTable tbody tr").forEach(row => {
+        const nameInput = row.querySelector(".target-var-name");
+        const valueInput = row.querySelector(".target-var-value");
+        targets.push({
+            name: nameInput ? nameInput.value : "",
+            value: valueInput ? valueInput.value : ""
+        });
+    });
+
+    return {
+        targets,
+        commandState: saveState(),
+        keepVarNameInFileName: document.getElementById("keepVarNameInFileName")?.checked ?? false,
+        expandVarNameInFileName: document.getElementById("expandVarNameInFileName")?.checked ?? false,
+        includeGuidanceText: document.getElementById("includeGuidanceText")?.checked ?? false,
+        guidanceType: document.getElementById("guidanceType")?.value ?? "exo",
+        includeTranscript: document.getElementById("includeTranscript")?.checked ?? false,
+        exportToDesktop: document.getElementById("exportToDesktop")?.checked ?? false,
+        exportPath: document.getElementById("exportPath")?.value ?? "",
+        premiseSuffix: document.getElementById("premiseSuffix")?.checked ?? false
+    };
+}
+
+// Saves current settings to localStorage under the given name.
+function saveSettingsToStorage(name) {
+    const presets = getAllPresets();
+    presets[name] = collectAllSettings();
+    presets[name].name = name;
+    localStorage.setItem("exchangeTemplatePresets", JSON.stringify(presets));
+    updatePresetSelect();
+}
+
+// Applies a settings object to the current UI.
+function applySettings(settings, presetName = "") {
+    document.getElementById("presetName").value = presetName;
+
+    const targetTableBody = document.querySelector("#targetTable tbody");
+    if (targetTableBody && Array.isArray(settings.targets) && settings.targets.length > 0) {
+        targetTableBody.innerHTML = "";
+        settings.targets.forEach(target => {
+            const row = targetTableBody.insertRow();
+            row.innerHTML = `
+                <td><input class="target-var-name" onchange="handleVarNameInput(this)"></td>
+                <td><input class="target-var-value"></td>
+                <td><button type="button" onclick="removeTarget(this)">削除</button></td>
+            `;
+            row.querySelector(".target-var-name").value = target.name || "";
+            row.querySelector(".target-var-value").value = target.value || "";
+        });
+    }
+
+    const setChecked = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.checked = !!val;
+    };
+    const setValue = (id, val) => {
+        const el = document.getElementById(id);
+        if (el && val !== undefined) el.value = val;
+    };
+
+    setChecked("keepVarNameInFileName", settings.keepVarNameInFileName);
+    setChecked("expandVarNameInFileName", settings.expandVarNameInFileName);
+    setChecked("includeGuidanceText", settings.includeGuidanceText);
+    setValue("guidanceType", settings.guidanceType);
+    setChecked("includeTranscript", settings.includeTranscript);
+    setChecked("exportToDesktop", settings.exportToDesktop);
+    setValue("exportPath", settings.exportPath);
+    setChecked("premiseSuffix", settings.premiseSuffix);
+
+    handleVarNameInput(null, false);
+    normalizeExportPathInput();
+    toggleVarNameInFileNameOptions();
+    toggleGuidanceTypeOptions();
+
+    // Build a default state for all current commands, then overlay with saved state
+    // to safely handle commands added after the preset was saved.
+    const defaultCommandState = {};
+    commandDefinition.forEach(cmd => {
+        defaultCommandState[cmd.commandName] = {
+            enabled: false, targets: [], params: [], parameterValues: {},
+            expandedTargets: false, expandedParams: false
+        };
+    });
+    const mergedCommandState = Object.assign(defaultCommandState, settings.commandState || {});
+
+    renderCommands();
+    restoreState(mergedCommandState);
+}
+
+// Loads settings from localStorage by name and applies them to the UI.
+function loadSettingsFromStorage(name) {
+    const presets = getAllPresets();
+    const settings = presets[name];
+    if (!settings) return;
+    applySettings(settings, name);
+}
+
+// Updates the preset dropdown to reflect current localStorage contents.
+function updatePresetSelect() {
+    const select = document.getElementById("presetSelect");
+    if (!select) return;
+    const presets = getAllPresets();
+    const currentValue = select.value;
+    select.innerHTML = '<option value="">-- 設定を選択 --</option>';
+    Object.keys(presets).sort().forEach(name => {
+        const option = document.createElement("option");
+        option.value = name;
+        option.textContent = name;
+        select.appendChild(option);
+    });
+    if (currentValue && presets[currentValue]) {
+        select.value = currentValue;
+    }
+}
+
+// Saves the current settings under the name entered in the preset name input.
+function savePreset() {
+    const nameInput = document.getElementById("presetName");
+    const name = nameInput ? nameInput.value.trim() : "";
+    if (!name) {
+        alert("設定名を入力してください。");
+        if (nameInput) nameInput.focus();
+        return;
+    }
+    const presets = getAllPresets();
+    if (presets[name] && !confirm(`"${name}" は既に存在します。上書きしますか？`)) {
+        return;
+    }
+    saveSettingsToStorage(name);
+    const select = document.getElementById("presetSelect");
+    if (select) select.value = name;
+}
+
+// Loads the preset selected in the dropdown.
+function loadPreset() {
+    const select = document.getElementById("presetSelect");
+    const name = select ? select.value : "";
+    if (!name) {
+        alert("読み込む設定を選択してください。");
+        return;
+    }
+    loadSettingsFromStorage(name);
+}
+
+// Sets the current settings as the default preset.
+function setDefault() {
+    const select = document.getElementById("presetSelect");
+    const name = select ? select.value : "";
+    if (!name) {
+        alert("読み込む設定を選択してください。");
+        return;
+    }
+    const presets = getAllPresets();
+    const settings = presets[name];
+    if (!settings) return;
+    Object.keys(presets).forEach(key => {
+        presets[key].isDefault = key === name;
+    });
+    localStorage.setItem("exchangeTemplatePresets", JSON.stringify(presets));
+    alert(`"${name}" をデフォルト設定にしました。`);
+}
+
+// Deletes the preset selected in the dropdown.
+function deleteSelectedPreset() {
+    const select = document.getElementById("presetSelect");
+    const name = select ? select.value : "";
+    if (!name) {
+        alert("削除する設定を選択してください。");
+        return;
+    }
+    if (!confirm(`"${name}" を削除しますか？`)) return;
+    const presets = getAllPresets();
+    delete presets[name];
+    localStorage.setItem("exchangeTemplatePresets", JSON.stringify(presets));
+    updatePresetSelect();
+}
+
 window.onload = function () {
     handleVarNameInput(null, false);
     normalizeExportPathInput();
@@ -1529,5 +1718,15 @@ window.onload = function () {
         commandSearchInput.value = commandUiState.searchText;
     }
 
-    renderCommands();
+    updatePresetSelect();
+
+    const defaultPresetEntry = Object.entries(getAllPresets()).find(([, preset]) => preset.isDefault);
+    if (defaultPresetEntry) {
+        const [defaultName, defaultSettings] = defaultPresetEntry;
+        applySettings(defaultSettings, defaultName);
+        const select = document.getElementById("presetSelect");
+        if (select) select.value = defaultName;
+    } else {
+        renderCommands();
+    }
 };

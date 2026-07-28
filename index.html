@@ -61,7 +61,7 @@
         </div>
 
         <div class="right-panel">
-            <h2>オプション</h2>
+             <h2>オプション</h2>
             <div class="section">
                 <div class="option-item">
                     <label>
@@ -118,6 +118,23 @@
                     </div>
                     <div class="option-note">Mailbox_User1_ExO.xml</div>
                     <div class="option-note">Mailbox_User1_Onprem.xml</div>
+                </div>
+            </div>
+
+            <h2>設定プリセット</h2>
+            <p class="option-note" style="margin-left: 0;">現在のコマンドの選択状態や設定値をブラウザーに保存して読み込むことができます。</p>
+            <div class="section">
+                <div class="preset-row">
+                    <input id="presetName" type="text" placeholder="設定名を入力">
+                    <button type="button" onclick="savePreset()">保存</button>
+                </div>
+                <div class="preset-row">
+                    <select id="presetSelect">
+                        <option value="">-- 設定を選択 --</option>
+                    </select>
+                    <button type="button" onclick="loadPreset()">読み込み</button>
+                    <button type="button" onclick="setDefault()">既定に設定</button>
+                    <button type="button" onclick="deleteSelectedPreset()">削除</button>
                 </div>
             </div>
 
