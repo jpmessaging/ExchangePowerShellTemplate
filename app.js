@@ -343,6 +343,18 @@ function sanitizeVarName(raw) {
 // Updates a command-level checkbox state based on its target checkbox states.
 function updateParentCheckbox(commandName) {
     const cmdToggle = document.querySelector(`.cmd-toggle[data-cmd="${commandName}"]`);
+    const commandDef = commandDefinition.find(cmd => cmd.commandName === commandName);
+
+    if (!cmdToggle) {
+        return;
+    }
+
+    // orgLevel commands do not have per-target children, so keep a binary checked state.
+    if (commandDef && commandDef.orgLevel) {
+        cmdToggle.indeterminate = false;
+        return;
+    }
+
     const children = document.querySelectorAll(`.${commandName}_target`);
 
     const total = children.length;
@@ -369,6 +381,14 @@ function updateAllParentCheckboxes() {
 
 // Applies a command-level checkbox state to all target checkboxes for that command.
 function toggleAllTargetsForCommand(commandName, parentCheckbox) {
+    const commandDef = commandDefinition.find(cmd => cmd.commandName === commandName);
+
+    if (commandDef && commandDef.orgLevel) {
+        parentCheckbox.indeterminate = false;
+        updateGuidanceTypeIfNeeded();
+        return;
+    }
+
     const children = document.querySelectorAll(`.${commandName}_target`);
 
     children.forEach(cb => {
@@ -565,7 +585,7 @@ function renderCommands() {
     commandDefinition.forEach(cmd => {
         const commandName = cmd.commandName;
         const hasParameters = Array.isArray(cmd.parameters) && cmd.parameters.length > 0;
-        const isOrgLevel = !cmd.orgLevel;
+        const hasTargetScope = !cmd.orgLevel;
         const div = document.createElement("div");
         div.className = "cmd-block";
         div.setAttribute("data-cmd", commandName);
@@ -593,7 +613,7 @@ function renderCommands() {
                         onclick="toggleGroup('${commandName}', 'targets')"
                         data-cmd="${commandName}"
                         data-group="targets"
-                        ${isOrgLevel ? "" : "disabled aria-disabled=\"true\""}>
+                        ${hasTargetScope ? "" : "disabled aria-disabled=\"true\""}>
                     <span id="chevron_targets_${commandName}" class="chevron">▶</span>
                     対象
                 </button>
@@ -613,21 +633,23 @@ function renderCommands() {
             <div id="targetGroup_${commandName}" class="target-group">
         `;
 
-        targetNameInputs.forEach((input, i) => {
-            const name = input.value.trim();
+        if (hasTargetScope) {
+            targetNameInputs.forEach((input, i) => {
+                const name = input.value.trim();
 
-            if (name) {
-                html += `
-                    <label>
-                        <input type="checkbox"
-                               class="${commandName}_target"
-                               value="${i}"
-                               onchange="updateParentCheckbox('${commandName}')">
-                        ${name}
-                    </label>
-                `;
-            }
-        });
+                if (name) {
+                    html += `
+                        <label>
+                            <input type="checkbox"
+                                   class="${commandName}_target"
+                                   value="${i}"
+                                   onchange="updateParentCheckbox('${commandName}')">
+                            ${name}
+                        </label>
+                    `;
+                }
+            });
+        }
 
         html += `
             </div>
