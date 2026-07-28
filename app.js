@@ -24,6 +24,7 @@ URL: https://learn.microsoft.com/ja-jp/powershell/microsoftgraph/installation?vi
 
 const commandDefinition = window.commandDefinition || [];
 
+// Normalizes a tag value to a string array, filtering out empty entries.
 function normalizeTagArray(tagValue) {
     if (Array.isArray(tagValue)) {
         return tagValue.filter(tag => !!tag).map(tag => String(tag));
@@ -69,6 +70,7 @@ const tagCatalog = Array.from(
     return a.localeCompare(b, "ja");
 });
 
+// Returns a unique filter key string for the given tag.
 function getTagFilterKey(tag) {
     return `tag:${String(tag).toLowerCase()}`;
 }
@@ -89,6 +91,7 @@ tagCatalog.forEach(tag => {
     commandUiState.filters[getTagFilterKey(tag)] = false;
 });
 
+// Renders tag filter chip buttons in the tag filter container.
 function renderTagFilterChips() {
     const container = document.getElementById("tagFilterChips");
     if (!container) {
@@ -110,6 +113,7 @@ function renderTagFilterChips() {
     });
 }
 
+// Builds a normalized searchable text string from a command definition.
 function buildCommandSearchText(commandDef) {
     const paramKeys = (commandDef.parameters || []).map(param => param.key || "").join(" ");
     const optionsText = (commandDef.parameters || [])
@@ -121,11 +125,13 @@ function buildCommandSearchText(commandDef) {
     return `${commandDef.commandName} ${paramKeys} ${optionsText} ${applicableText}`.toLowerCase();
 }
 
+// Updates the search text state and applies filters when the search input changes.
 function handleCommandSearchInput(inputEl) {
     commandUiState.searchText = (inputEl?.value || "").trim().toLowerCase();
     applyCommandFilters();
 }
 
+// Clears the command search input and resets the search filter.
 function clearCommandSearch() {
     const searchInput = document.getElementById("commandSearch");
     if (searchInput) {
@@ -136,6 +142,7 @@ function clearCommandSearch() {
     applyCommandFilters();
 }
 
+// Toggles the active state of a single command filter and re-applies filters.
 function toggleCommandFilter(filterKey) {
     if (!Object.prototype.hasOwnProperty.call(commandUiState.filters, filterKey)) {
         return;
@@ -145,6 +152,7 @@ function toggleCommandFilter(filterKey) {
     applyCommandFilters();
 }
 
+// Updates the visual active state of all filter chip buttons to match current filter state.
 function updateCommandFilterChipStates() {
     Object.entries(commandUiState.filters).forEach(([key, active]) => {
         const chip = document.getElementById(`filterChip_${key}`);
@@ -157,6 +165,7 @@ function updateCommandFilterChipStates() {
     });
 }
 
+// Returns true if a command definition matches all currently active filters and search text.
 function commandMatchesActiveFilters(commandDef) {
     const filters = commandUiState.filters;
     const activeApplicableFilters = ["exo", "onprem", "graph"].filter(key => filters[key]);
@@ -195,6 +204,7 @@ function commandMatchesActiveFilters(commandDef) {
     return searchable.includes(query);
 }
 
+// Shows or hides command blocks based on active filters and updates the result count.
 function applyCommandFilters() {
     const totalCount = commandDefinition.length;
     let visibleCount = 0;
@@ -225,6 +235,7 @@ function applyCommandFilters() {
     updateCommandFilterChipStates();
 }
 
+// Composes the full guidance text including connection steps and the generated command block.
 function generateGuidanceSteps(varDefsText, commandText) {
     const guidanceTypeValue = document.getElementById("guidanceType")?.value ?? "exo";
     const includeTranscript = document.getElementById("includeTranscript");
@@ -1238,6 +1249,11 @@ function buildCommandLinesForTarget(commandDef, targetVarName, selectedParams) {
     });
 
     // Expand multi-checkbox-split keys into one command per selected value (cartesian product across keys).
+    // Example: { "-FolderScope": ["Calendar", "Inbox"], "-ComponentName": ["RBA", "MRM"] }
+    //   -> [ { "-FolderScope": "Calendar", "-ComponentName": "RBA" },
+    //        { "-FolderScope": "Calendar", "-ComponentName": "MRM" },
+    //        { "-FolderScope": "Inbox",    "-ComponentName": "RBA" },
+    //        { "-FolderScope": "Inbox",    "-ComponentName": "MRM" } ]
     let multiCheckboxSplitVariants = [{}];
     Object.entries(selectedMultiCheckboxSplitParams).forEach(([key, values]) => {
         if (!Array.isArray(values)) {
