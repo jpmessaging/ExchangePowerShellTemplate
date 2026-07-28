@@ -308,7 +308,9 @@ function generateGuidanceSteps(varDefsText, commandText) {
 
     guidanceText += `${step++}. 以下のコマンドを順に実行し、出力される XML ファイルを弊社までお寄せください。\n\n`;
     guidanceText += "   コマンド)\n";
-    guidanceText += `${varDefsGuidanceText}\n`;
+    if (varDefsGuidanceText) {
+        guidanceText += `${varDefsGuidanceText}\n`;
+    }
     guidanceText += `${commandGuidanceText}`;
 
     if (transcriptEnabled) {
