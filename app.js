@@ -1307,7 +1307,7 @@ function buildCommandLinesForTarget(commandDef, targetVarName, selectedParams) {
 }
 
 // Generates the output chunk for one command across all selected targets.
-function buildCommandOutputChunk(selectedCommand, targetVarNames) {
+function buildCommandOutput(selectedCommand, targetVarNames) {
     const commandName = selectedCommand.commandName;
     const cmdToggle = document.querySelector(`.cmd-toggle[data-cmd="${commandName}"]`);
 
@@ -1475,7 +1475,7 @@ function generate() {
     const includeGuidanceTextEnabled = validationResult.includeGuidanceTextEnabled;
 
     for (const selectedCommand of validationResult.selectedCommands) {
-        const chunk = buildCommandOutputChunk(selectedCommand, targetVarNames);
+        const chunk = buildCommandOutput(selectedCommand, targetVarNames);
         if (chunk === null) {
             return;
         }
