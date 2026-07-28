@@ -1134,20 +1134,49 @@ function buildCommandLine(commandDef, targetVarName, selectedParamsByType) {
         const folder = getVariantValue("Folder");
         const pairedEnglish = getPairedEnglishFolderName(commandDef, folder);
         const englishFolderName = pairedEnglish || folder;
+        const selectedFolders = Array.from(
+            document.querySelectorAll(`.${commandName}_value_Folder:checked`)
+        ).map(cb => cb.value);
+        const selectedTargetVarNames = Array.from(
+            document.querySelectorAll(`.${commandName}_target:checked`)
+        )
+            .map(cb => {
+                const index = parseInt(cb.value, 10);
+                const input = document.querySelectorAll(".target-var-name")[index];
+                return input ? input.value.trim() : "";
+            })
+            .filter(name => !!name);
+        const isLastTarget = selectedTargetVarNames.length === 0
+            ? true
+            : targetVarName === selectedTargetVarNames[selectedTargetVarNames.length - 1];
+        const isLastSelectedFolder = selectedFolders.length === 0
+            ? true
+            : folder === selectedFolders[selectedFolders.length - 1];
         const outputFile = `${fileNamePrefix}${varNameSegment}_${englishFolderName}${switchSplitSuffix}.xml`;
-        let commandLine = "";
+        const commandLine = folder === "ルート"
+            ? `${commandName} ${bracedTargetVarName} | ${EXPORT_CLIXML_ENCODING} "${outputFile}"`
+            : `${commandName} "${bracedTargetVarName}:\\${folder}" | ${EXPORT_CLIXML_ENCODING} "${outputFile}"`;
 
-        if (folder === "ルート") {
-            commandLine = `${commandName} ${bracedTargetVarName} | ${EXPORT_CLIXML_ENCODING} "${outputFile}"`;
-        } else {
-            commandLine = `${commandName} "${bracedTargetVarName}:\\${folder}" | ${EXPORT_CLIXML_ENCODING} "${outputFile}"`;
+        if (!(isLastTarget && isLastSelectedFolder)) {
+            return commandLine;
         }
 
-        if (pairedEnglish && pairedEnglish !== folder && folder !== "ルート") {
-            return `${commandLine}\n# エラーになる場合は、":\\${folder}" の代わりに ":\\${pairedEnglish}" をお試しください。\n`;
+        const noteLines = selectedFolders
+            .map(selectedFolder => {
+                const selectedPairedEnglish = getPairedEnglishFolderName(commandDef, selectedFolder);
+                if (!selectedPairedEnglish || selectedPairedEnglish === selectedFolder || selectedFolder === "ルート") {
+                    return "";
+                }
+
+                return `# エラーになる場合は、":\\${selectedFolder}" の代わりに ":\\${selectedPairedEnglish}" をお試しください。`;
+            })
+            .filter(line => !!line);
+
+        if (noteLines.length === 0) {
+            return commandLine;
         }
 
-        return commandLine;
+        return `${commandLine}\n${noteLines.join("\n")}`;
     }
 
     if (commandDef.commandName === "Get-InboxRule") {
