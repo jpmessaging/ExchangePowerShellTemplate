@@ -1057,30 +1057,36 @@ function collectSelectedParams(commandDef) {
 // Builds one formatted command line for a command, target, and parameter combination.
 function buildCommandLine(commandDef, targetVarName, selectedParamsByType) {
     const EXPORT_CLIXML_ENCODING = "Export-CliXml -Encoding UTF8";
-    
+
+    // Input parameter extraction
+    const selectedSwitchSplitParams = selectedParamsByType.switchSplit || [];
+    const selectedAllSwitchParams = [...(selectedParamsByType.switch || []), ...selectedSwitchSplitParams];
+    const selectedMultiCheckboxParams = selectedParamsByType.multiCheckbox || {};
+    const selectedMultiCheckboxSplitParams = selectedParamsByType.multiCheckboxSplit || {};
+    const getVariantValue = key => selectedMultiCheckboxSplitParams[key] || "";
+
+    // Command identity
+    const commandName = commandDef.commandName || commandDef.CommandName;
+    const fileNamePrefix = getfileNamePrefixFromCommand(commandDef.commandName);
+
+    // UI options for output file naming
     const keepVarNameInFileName = document.getElementById("keepVarNameInFileName")?.checked ?? false;
     const expandVarNameInFileName = document.getElementById("expandVarNameInFileName")?.checked ?? false;
     const premiseSuffix = getPremiseSuffixForFileName();
-    const selectedAllSwitchParams = [
-        ...(selectedParamsByType.switch || []),
-        ...(selectedParamsByType.switchSplit || [])
-    ];
-    const selectedSwitchSplitParams = selectedParamsByType.switchSplit || [];
-    const selectedMultiCheckboxParams = selectedParamsByType.multiCheckbox || {};
-    const selectedMultiCheckboxSplitParams = selectedParamsByType.multiCheckboxSplit || {};
 
-    const commandName = commandDef.commandName || commandDef.CommandName;
-    const fileNamePrefix = getfileNamePrefixFromCommand(commandDef.commandName);
+    // Output file name segment components
     const bracedTargetVarName = "${" + targetVarName + "}";
-    const switchSplitSuffix = selectedSwitchSplitParams.length > 0 ? `_${selectedSwitchSplitParams.map(param => param.replace(/^-+/, "")).join("_")}` : "";
+    const switchSplitSuffix = selectedSwitchSplitParams.length > 0
+        ? `_${selectedSwitchSplitParams.map(param => param.replace(/^-+/, "")).join("_")}`
+        : "";
     // When expandVarNameInFileName is true, use the braced form (e.g. ${User1}) so PowerShell
     // expands the variable at runtime. When false, embed the literal name (e.g. User1) instead.
     const varNameInFileName = !keepVarNameInFileName
         ? ""
-        : (expandVarNameInFileName
-            ? `${bracedTargetVarName}${premiseSuffix}`
-            : `${targetVarName}${premiseSuffix}`);
+        : (expandVarNameInFileName ? `${bracedTargetVarName}${premiseSuffix}` : `${targetVarName}${premiseSuffix}`);
     const varNameSegment = varNameInFileName ? `_${varNameInFileName}` : "";
+
+    // Command line text components
     const switchParamText = selectedAllSwitchParams.length > 0
         ? ` ${selectedAllSwitchParams.join(" ")}`
         : "";
@@ -1088,7 +1094,6 @@ function buildCommandLine(commandDef, targetVarName, selectedParamsByType) {
         .filter(([, values]) => Array.isArray(values) && values.length > 0)
         .map(([key, values]) => ` ${key} ${values.join(",")}`)
         .join("");
-    const getVariantValue = key => selectedMultiCheckboxSplitParams[key] || "";
 
     if (commandDef.orgLevel) {
         const outputFile = `${fileNamePrefix}${premiseSuffix}${switchSplitSuffix}.xml`;
