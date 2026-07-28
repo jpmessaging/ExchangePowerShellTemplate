@@ -38,6 +38,20 @@ body {
             margin-bottom: 8px;
         }
 
+        .preset-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
+        #presetName,
+        #presetSelect {
+            flex: 1;
+            min-width: 0;
+            max-width: 140px;
+        }
+
         .commands-toolbar {
             position: sticky;
             top: 0;
