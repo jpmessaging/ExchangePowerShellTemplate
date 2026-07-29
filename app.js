@@ -1195,7 +1195,7 @@ function buildCommandLine(commandDef, targetVarName, selectedParamsByType) {
                     return "";
                 }
 
-                return `# エラーになる場合は、":\\${selectedFolder}" の代わりに ":\\${selectedPairedEnglish}" をお試しください。`;
+                return `# Get-MailboxFolderPermission コマンドでエラーになる場合は、":\\${selectedFolder}" の代わりに ":\\${selectedPairedEnglish}" をお試しください。`;
             })
             .filter(line => !!line);
 
