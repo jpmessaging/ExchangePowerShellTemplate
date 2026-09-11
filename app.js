@@ -955,7 +955,9 @@ function getExportFolderPath() {
     const exportToDesktop = document.getElementById("exportToDesktop");
 
     if (exportToDesktop && exportToDesktop.checked) {
-        return "~\\Desktop";
+        // Just using %HOMEPATH% is not reliable if OneDrive is redirecting Desktop folder.
+        // https://learn.microsoft.com/en-us/sharepoint/redirect-known-folders
+        return "([Environment]::GetFolderPath('Desktop'))";
     }
 
     return getExportDirectoryPath();
