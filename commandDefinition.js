@@ -1,7 +1,7 @@
 window.commandDefinition = [
     {
         commandName: "Get-Mailbox",
-        tag: ["Mailbox"],
+        tag: ["Mailbox", "MailboxMove"],
         parameters: [
             { key: "-Archive", type: "switch" },
             { key: "-SoftDeletedMailbox", type: "switch-split" },
@@ -97,7 +97,7 @@ window.commandDefinition = [
     },
     {
         commandName: "Get-MailUser",
-        tag: ["Other recipient"],
+        tag: ["Other recipient", "MailboxMove"],
         applicable: ["exo", "onprem"]
     },
     {
@@ -201,7 +201,7 @@ window.commandDefinition = [
     },
     {
         commandName: "Get-RemoteMailbox",
-        tag: ["Mailbox", "Other recipient"],
+        tag: ["Mailbox", "Other recipient", "MailboxMove"],
         applicable: ["onprem"]
     },
     {
@@ -285,6 +285,43 @@ window.commandDefinition = [
         orgLevel: true
     },
     {
+        commandName: "Get-MigrationBatch",
+        tag: ["Organization", "MailboxMove"],
+        applicable: ["exo", "onprem"],
+        orgLevel: true,
+        parameters: [
+            { key: "-IncludeReport", type: "switch" }
+        ]
+    },
+    {
+        commandName: "Get-MoveRequest",
+        tag: ["MailboxMove"],
+        applicable: ["exo", "onprem"],
+        parameters: []
+    },
+    {
+        commandName: "Get-MoveRequestStatistics",
+        tag: ["MailboxMove"],
+        applicable: ["exo", "onprem"],
+        parameters: [
+            { key: "-IncludeReport", type: "switch" }
+        ]
+    },
+    {
+        commandName: "Get-MigrationUser",
+        tag: ["MailboxMove"],
+        applicable: ["exo", "onprem"],
+        parameters: []
+    },
+    {
+        commandName: "Get-MigrationUserStatistics",
+        tag: ["MailboxMove"],
+        applicable: ["exo", "onprem"],
+        parameters: [
+            { key: "-IncludeReport", type: "switch" }
+        ]
+    },
+    {
         commandName: "Get-RetentionPolicy",
         tag: ["Organization"],
         applicable: ["exo", "onprem"],
@@ -324,4 +361,3 @@ window.commandDefinition = [
         orgLevel: true
     }
 ];
-

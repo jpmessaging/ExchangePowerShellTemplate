@@ -51,6 +51,7 @@ const TAG_FILTER_ORDER = [
     "Organization",
     "Calendar",
     "Transport",
+    "MailboxMove"
 ];
 
 const tagOrderMap = new Map(
