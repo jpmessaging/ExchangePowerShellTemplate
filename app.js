@@ -561,15 +561,11 @@ function restoreState(state) {
         }
 
         document.querySelectorAll(`.${commandName}_target`).forEach(cb => {
-            if (state[commandName].targets.includes(cb.value)) {
-                cb.checked = true;
-            }
+            cb.checked = state[commandName].targets.includes(cb.value);
         });
 
         document.querySelectorAll(`.${commandName}_param`).forEach(cb => {
-            if (state[commandName].params.includes(cb.value)) {
-                cb.checked = true;
-            }
+            cb.checked = state[commandName].params.includes(cb.value);
         });
 
         if (cmd.parameters && cmd.parameters.length > 0) {
